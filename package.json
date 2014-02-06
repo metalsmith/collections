@@ -9,7 +9,7 @@
     "defaults": "~1.0.0"
   },
   "devDependencies": {
-    "metalsmith": "~0.0.2",
+    "metalsmith": "0.x",
     "mocha": "1.x"
   }
 }
