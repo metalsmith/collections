@@ -2,6 +2,7 @@
 0.0.3 - February 6, 2013
 ------------------------
 * add debug statements
+* swap to `extend` from `defaults` to avoid cloning
 
 0.0.2 - February 6, 2013
 ------------------------
