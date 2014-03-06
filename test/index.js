@@ -15,6 +15,21 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should match collections by pattern', function(done){
+    var metalsmith = Metalsmith('test/fixtures/basic');
+    metalsmith
+      .use(collections({
+        articles: {
+          pattern: '*.md'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        assert.equal(3, metalsmith.metadata().articles.length);
+        done();
+      });
+  });
+
   it('should accept a "sortBy" option', function(done){
     var metalsmith = Metalsmith('test/fixtures/sort');
     metalsmith
