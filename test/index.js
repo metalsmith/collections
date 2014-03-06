@@ -47,4 +47,22 @@ describe('metalsmith-collections', function(){
         done();
       });
   });
+
+  it('should add next and previous references', function(done){
+    var metalsmith = Metalsmith('test/fixtures/references');
+    metalsmith
+      .use(collections({ articles: {}}))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert(!articles[0].previous);
+        assert.equal(articles[0].next, articles[1]);
+        assert.equal(articles[1].previous, articles[0]);
+        assert.equal(articles[1].next, articles[2]);
+        debugger;
+        assert.equal(articles[2].previous, articles[1]);
+        assert(!articles[2].next);
+        done();
+      });
+  });
 });
