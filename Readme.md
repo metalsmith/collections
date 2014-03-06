@@ -24,6 +24,7 @@
   - **by pattern** - this is just passing a globing pattern that will group any files that match into the same collection.
   - **by metadata** - this is adding a specific `collection` metadata field to each item that you want to add to a collection.
 
+  
   The simplest way to create a collection is to use a pattern to match the files you want to group together:
 
 ```json
