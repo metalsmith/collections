@@ -7,8 +7,8 @@ A Metalsmith plugin that groups files together into collections, which it adds t
 
   - can match files by `collection` metadata
   - can match files by pattern
-  - adds collection to global metadata
-  - adds `next` and `previous` references to each file
+  - adds collections to global metadata
+  - adds `next` and `previous` references to each file in the collection
 
 ## Installation
 
