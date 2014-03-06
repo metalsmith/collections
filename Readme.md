@@ -1,7 +1,7 @@
 
 # metalsmith-collections
 
-A Metalsmith plugin that groups files together into collections and adds them to the global metadata. This is helpful for things like blog posts, where you want to display an index of each.
+A Metalsmith plugin that groups files together into collections, which it adds to the global metadata. This is helpful for things like blog posts, where you want to display an index.
 
 ## Features
 
