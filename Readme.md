@@ -33,7 +33,7 @@ metalsmith.use(collections({
 
 Which is just a shorthand. You could also add additional options:
 
-```
+```js
 metalsmith.use(collections({
   articles: {
     pattern: '*.md',
@@ -45,7 +45,7 @@ metalsmith.use(collections({
 
 But you can also match based on a `collection` property in each file's metadata by omitting a pattern, and adding the property to your files:
 
-```
+```js
 metalsmith.use(collections({
   articles: {
     sortBy: 'date',
