@@ -10,7 +10,9 @@ describe('metalsmith-collections', function(){
       .use(collections({ articles: {}}))
       .build(function(err){
         if (err) return done(err);
-        assert.equal(2, metalsmith.metadata().articles.length);
+        var m = metalsmith.metadata();
+        assert.equal(2, m.articles.length);
+        assert.equal(m.collections.articles, m.articles);
         done();
       });
   });
