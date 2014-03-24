@@ -2,7 +2,7 @@
   "name": "metalsmith-collections",
   "description": "A Metalsmith plugin that adds collections of files to the global metadata.",
   "repository": "git://github.com/segmentio/metalsmith-collections.git",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {

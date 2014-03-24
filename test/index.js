@@ -18,7 +18,7 @@ describe('metalsmith-collections', function(){
   });
 
   it('should match collections by pattern', function(done){
-    var metalsmith = Metalsmith('test/fixtures/basic');
+    var metalsmith = Metalsmith('test/fixtures/pattern');
     metalsmith
       .use(collections({
         articles: {
@@ -33,7 +33,7 @@ describe('metalsmith-collections', function(){
   });
 
   it('should take a pattern shorthand string', function(done){
-    var metalsmith = Metalsmith('test/fixtures/basic');
+    var metalsmith = Metalsmith('test/fixtures/pattern');
     metalsmith
       .use(collections({
         articles: '*.md'
@@ -41,6 +41,19 @@ describe('metalsmith-collections', function(){
       .build(function(err){
         if (err) return done(err);
         assert.equal(3, metalsmith.metadata().articles.length);
+        done();
+      });
+  });
+
+  it('should add the collection property to a file', function(done){
+    var metalsmith = Metalsmith('test/fixtures/pattern');
+    metalsmith
+      .use(collections({
+        articles: '*.md'
+      }))
+      .build(function(err, files){
+        if (err) return done(err);
+        assert.equal(files['three.md'].collection, 'articles');
         done();
       });
   });

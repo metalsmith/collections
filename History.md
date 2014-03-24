@@ -1,4 +1,8 @@
 
+0.3.0 - March 24, 2013
+----------------------
+* add `collection` property to each file for pattern matches
+
 0.2.0 - March 20, 2013
 ----------------------
 * add collections dictionary to global metadata
