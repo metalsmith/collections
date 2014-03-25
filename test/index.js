@@ -72,6 +72,26 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should accept a "sortBy" function', function(done){
+    var metalsmith = Metalsmith('test/fixtures/sort');
+    metalsmith
+      .use(collections({ articles: { sortBy: sort }}))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal('Gamma', articles[0].title);
+        assert.equal('Beta', articles[1].title);
+        assert.equal('Alpha', articles[2].title);
+        done();
+      });
+
+    function sort(a, b){
+      a = a.title.slice(1);
+      b = b.title.slice(1);
+      return a > b ? 1 : -1;
+    }
+  });
+
   it('should accept a "reverse" option', function(done){
     var metalsmith = Metalsmith('test/fixtures/sort');
     metalsmith
