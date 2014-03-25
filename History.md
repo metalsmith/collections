@@ -1,4 +1,8 @@
 
+0.4.0 - March 25, 2013
+----------------------
+* add option for `sortBy` to be a sorting function
+
 0.3.0 - March 24, 2013
 ----------------------
 * add `collection` property to each file for pattern matches
