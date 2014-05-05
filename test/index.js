@@ -128,4 +128,21 @@ describe('metalsmith-collections', function(){
         done();
       });
   });
+
+  it('should not fail with empty collections', function(done) {
+    var metalsmith = Metalsmith('test/fixtures/empty');
+    metalsmith
+      .use(collections({
+        articles: {
+          sortBy: 'date',
+          reverse: true
+        }
+      }))
+      .build(function(err) {
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal(articles.length, 0);
+        done();
+      });
+  });
 });
