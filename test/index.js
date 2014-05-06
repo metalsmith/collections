@@ -129,6 +129,19 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should add the file name', function(done){
+    var metalsmith = Metalsmith('test/fixtures/basic');
+    metalsmith
+      .use(collections({ articles: {}}))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal(articles[0].file, 'one.md');
+        assert.equal(articles[1].file, 'two.md');
+        done();
+      });
+  });
+
   it('should not fail with empty collections', function(done) {
     var metalsmith = Metalsmith('test/fixtures/empty');
     metalsmith
