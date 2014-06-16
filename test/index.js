@@ -1,6 +1,7 @@
 
 var assert = require('assert');
 var Metalsmith = require('metalsmith');
+var _ = require('underscore');
 var collections = require('..');
 
 describe('metalsmith-collections', function(){
@@ -142,6 +143,34 @@ describe('metalsmith-collections', function(){
         if (err) return done(err);
         var articles = metalsmith.metadata().articles;
         assert.equal(articles.length, 0);
+        done();
+      });
+  });
+
+  it('should create nested collections', function(done){
+    var getTitles = function(collection) {
+      return _.map(collection, function(e){return e.title;});
+    };
+    var metalsmith = Metalsmith('test/fixtures/nested');
+    metalsmith
+      .use(collections({
+        articles: {
+          pattern: '*.md',
+          sortBy: 'title'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal(3, m.collections.articles.length);
+        assert.equal('a', getTitles(m.collections.articles)[0]);
+        assert.equal('b', getTitles(m.collections.articles)[1]);
+        assert.equal('c', getTitles(m.collections.articles)[2]);
+        assert.equal("nested collection summary", m.collections.articles[1].text);
+        assert.equal(true, _.isArray(m.collections.articles[1].content));
+        assert.equal(2, m.collections.articles[1].content.length);
+        assert.equal('bb', getTitles(m.collections.articles[1].content)[0]);
+        assert.equal('aa', getTitles(m.collections.articles[1].content)[1]);
         done();
       });
   });
