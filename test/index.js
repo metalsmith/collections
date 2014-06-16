@@ -166,6 +166,7 @@ describe('metalsmith-collections', function(){
         assert.equal('a', getTitles(m.collections.articles)[0]);
         assert.equal('b', getTitles(m.collections.articles)[1]);
         assert.equal('c', getTitles(m.collections.articles)[2]);
+        assert.equal("nested collection summary", m.collections.articles[1].text);
         assert.equal(true, _.isArray(m.collections.articles[1].content));
         assert.equal(2, m.collections.articles[1].content.length);
         assert.equal('bb', getTitles(m.collections.articles[1].content)[0]);
