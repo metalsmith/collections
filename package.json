@@ -9,7 +9,8 @@
     "debug": "~0.7.4",
     "extend": "~1.2.1",
     "minimatch": "^0.2.14",
-    "uniq": "0.0.2"
+    "uniq": "0.0.2",
+    "read-metadata": "0.0.2"
   },
   "devDependencies": {
     "metalsmith": "0.x",

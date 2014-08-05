@@ -145,4 +145,53 @@ describe('metalsmith-collections', function(){
         done();
       });
   });
+
+  it('should add metadata objects to collections', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/basic');
+    metalsmith
+      .use(collections({
+        articles: {
+          metadata: { name: 'Batman' }
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal('Batman', m.articles.metadata.name);
+        done();
+      });
+  });
+
+  it('should load collection metadata from a JSON file', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/basic');
+    metalsmith
+      .use(collections({
+        articles: {
+          metadata: 'test/fixtures/metadata/metadata.json'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal('Batman', m.articles.metadata.name);
+        done();
+      });
+  });
+
+  it('should load collection metadata from a YAML file', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/basic');
+    metalsmith
+      .use(collections({
+        articles: {
+          metadata: 'test/fixtures/metadata/metadata.yaml'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal('Batman', m.articles.metadata.name);
+        done();
+      });
+  });
+
 });
