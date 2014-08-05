@@ -1,4 +1,9 @@
 
+0.5.0 / 2014-08-04
+==================
+
+  * Added the ability to add metadata to collections
+
 0.4.1 - May 4, 2014
 -------------------
 * fix empty collections
