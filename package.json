@@ -10,7 +10,7 @@
     "extend": "~1.2.1",
     "minimatch": "^0.2.14",
     "uniq": "0.0.2",
-    "load-metadata": "0.0.1"
+    "read-metadata": "0.0.2"
   },
   "devDependencies": {
     "metalsmith": "0.x",
