@@ -194,4 +194,21 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should allow multiple collections', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/multi');
+    metalsmith
+      .use(collections({ articles: {}, posts: {}, drafts: {} }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal(2, m.articles.length);
+        assert.equal(1, m.drafts.length);
+        assert.equal(1, m.posts.length);
+        assert.equal(m.collections.articles, m.articles);
+        assert.equal(m.collections.drafts, m.drafts);
+        assert.equal(m.collections.posts, m.posts);
+        done();
+      });
+  });
+
 });
