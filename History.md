@@ -1,4 +1,9 @@
 
+0.6.0 / 2014-08-12
+==================
+
+ * Added the ability to set multiple collections
+
 0.5.1 / 2014-08-05
 ==================
 
