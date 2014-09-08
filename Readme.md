@@ -64,6 +64,8 @@ My article contents...
 
 All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
 
+### Collection Metadata
+
 Additional metadata can be added to the collection object.
 
 ```js
