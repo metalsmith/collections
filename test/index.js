@@ -211,4 +211,19 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should allow collections through metadata alone', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/noconfig');
+    metalsmith
+      .use(collections({ movies: {} }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal(2, m.books.length);
+        assert.equal(1, m.movies.length);
+        assert.equal(m.collections.books, m.books);
+        assert.equal(m.collections.movies, m.movies);
+        done();
+      });
+  });
+
 });
