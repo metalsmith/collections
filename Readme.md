@@ -107,6 +107,17 @@ metalsmith.use(collections({
 }));
 ```
 
+By adding `refer: false` to your options, it will skip adding the "next" and
+"previous" links to your articles.
+
+```js
+metalsmith.use(collections({
+  articles: {
+    refer: false
+  }
+}));
+```
+
 
 ## CLI Usage
 
