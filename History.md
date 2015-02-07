@@ -1,4 +1,12 @@
 
+0.7.0 / 2015-02-07
+==================
+
+  * Allow front matter and pattern collections.
+  * Added the ability to limit the size of a collection
+  * Allow collections through metadata alone
+  * add ability to disable next/previous references
+
 0.6.0 / 2014-08-12
 ==================
 
