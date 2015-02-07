@@ -63,6 +63,7 @@ My article contents...
 ```
 
 All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
+You can omit passing any options to the plugin when matching based on a `collection` property.
 
 ### Collection Metadata
 
