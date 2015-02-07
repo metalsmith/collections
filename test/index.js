@@ -111,6 +111,46 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should accept a "limit" option', function (done){
+    var metalsmith = Metalsmith('test/fixtures/limit'),
+        limit = 2;
+    metalsmith
+      .use(collections({
+        articles: {
+            limit: limit,
+            sortBy: 'title',
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal(limit, articles.length);
+        assert.equal('Alpha', articles[0].title);
+        assert.equal('Beta', articles[1].title);
+        done();
+      });
+  });
+
+  it('should accept a "limit" higher than the collection length', function(done){
+    var metalsmith = Metalsmith('test/fixtures/limit');
+    metalsmith
+      .use(collections({
+        articles: {
+          sortBy: 'title',
+          limit: 25
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal(3, articles.length);
+        assert.equal('Alpha', articles[0].title);
+        assert.equal('Beta', articles[1].title);
+        assert.equal('Gamma', articles[2].title);
+        done();
+      });
+  });
+
   it('should add next and previous references', function(done){
     var metalsmith = Metalsmith('test/fixtures/references');
     metalsmith

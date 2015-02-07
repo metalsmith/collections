@@ -6,6 +6,7 @@ A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you gro
 
   - can match files by `collection` metadata
   - can match files by pattern
+  - can limit the number of files in a collection
   - adds collections to global metadata
   - adds `next` and `previous` references to each file in the collection
 
@@ -93,6 +94,19 @@ metalsmith.use(collections({
   }
 }));
 ```
+
+On each collection definition, it's possible to add a `limit` option so that the
+collection length is not higher than the given limit:
+
+```js
+metalsmith.use(collections({
+  lastArticles: {
+    sortBy: 'date',
+    limit: 10
+  }
+}));
+```
+
 
 ## CLI Usage
 
