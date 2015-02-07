@@ -129,6 +129,23 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should not add references if opts[key].refer === false', function(done){
+    var metalsmith = Metalsmith('test/fixtures/references-off');
+    metalsmith
+      .use(collections({ articles: { refer: false }}))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert(!articles[0].previous);
+        assert(!articles[0].next);
+        assert(!articles[1].previous);
+        assert(!articles[1].next);
+        assert(!articles[2].previous);
+        assert(!articles[2].next);
+        done();
+      });
+  });
+
   it('should not fail with empty collections', function(done) {
     var metalsmith = Metalsmith('test/fixtures/empty');
     metalsmith
