@@ -118,6 +118,30 @@ metalsmith.use(collections({
 }));
 ```
 
+### Collection Consolidation
+
+You can consolidate your collections into a single namespace instead of being on the root of metalsmith metadata by providing the `namespace` option.
+
+```js
+metalsmith.use(collections({
+  _options: {
+    namespace: 'groups'
+  },
+  articles: {
+    pattern: '*.md',
+    sortBy: 'date',
+    reverse: true
+  },
+  products: {
+    pattern: '*.html',
+    sortBy: 'date',
+    reverse: true
+  }
+}));
+```
+
+This will result in the `articles` and `products` collection metadata being added under the `groups` key on the metalsmith metadata, instead of directly to the metalsmith metadata root.
+
 
 ## CLI Usage
 
