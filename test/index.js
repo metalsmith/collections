@@ -268,6 +268,101 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should allow multiple collections by pattern', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/multi-pattern');
+    metalsmith
+      .use(collections({ articles: 'articles/*.md', posts: 'posts/*.md' }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal(2, m.articles.length);
+        assert.equal(1, m.posts.length);
+        assert.equal(m.collections.articles, m.articles);
+        assert.equal(m.collections.posts, m.posts);
+        done();
+      });
+  });
+
+  it('should allow dynamic collections', function(done){
+    var metalsmith = Metalsmith('test/fixtures/dynamic');
+    metalsmith
+      .use(collections({ countries: ':country/:city/*.md' }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        // arrays
+        assert.equal('canada', m.countries[0].country);
+        assert.equal('toronto', m.countries[0][0].city);
+        assert.equal(2, m.countries[0][0].length);
+        // aliases
+        assert.equal(m.countries[0], m.countries.canada);
+        assert.equal(m.countries[0][0], m.countries.canada.toronto);
+        assert.equal('toronto', m.countries.canada.toronto[0].city);
+        assert.equal('canada', m.countries.canada.toronto[0].country);
+        assert.equal(m.collections.countries, m.countries);
+        // frontmatter
+        assert.equal('bar', m.countries.canada.toronto[0].foo);
+        done();
+      });
+  });
+
+  it('should allow dynamic collections by frontmatter', function(done){
+    var metalsmith = Metalsmith('test/fixtures/dynamic-frontmatter');
+    metalsmith
+      .use(collections({ countries: ':country/:city' }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        // arrays
+        assert.equal('canada', m.countries[0].country);
+        assert.equal('toronto', m.countries[0][0].city);
+        assert.equal(2, m.countries[0][0].length);
+        // aliases
+        assert.equal(m.countries[0], m.countries.canada);
+        assert.equal(m.countries[0][0], m.countries.canada.toronto);
+        assert.equal('toronto', m.countries.canada.toronto[0].city);
+        assert.equal('canada', m.countries.canada.toronto[0].country);
+        assert.equal(m.collections.countries, m.countries);
+        // frontmatter
+        assert.equal('bar', m.countries.canada.toronto[0].foo);
+        done();
+      });
+  });
+
+  it('should handle dynamic collections with common prefixes', function(done) {
+    var metalsmith = Metalsmith('test/fixtures/dynamic-prefix');
+    metalsmith
+      .use(collections({ foo: 'departments/:department/:depart/*.md' }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal('engineering', m.foo[0].department);
+        assert.equal('tomorrow', m.foo[0][0].depart);
+        assert.equal(2, m.foo.engineering.tomorrow.length);
+        assert.equal(m.collections.foo, m.foo);
+        done();
+      });
+  });
+
+  it('should allow dynamic and static collections', function (done) {
+    var metalsmith = Metalsmith('test/fixtures/dynamic-integration');
+    metalsmith
+      .use(collections({
+        departments: 'departments/:department/*.md',
+        articles: 'articles/*.md'
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var m = metalsmith.metadata();
+        assert.equal('engineering', m.departments[0].department);
+        assert.equal(5, m.departments.engineering.length);
+        assert.equal(m.collections.departments, m.departments);
+        assert.equal(4, m.articles.length);
+        assert.equal(m.collections.articles, m.articles);
+        done();
+      });
+  });
+
   it('should allow collections through metadata alone', function (done) {
     var metalsmith = Metalsmith('test/fixtures/noconfig');
     metalsmith

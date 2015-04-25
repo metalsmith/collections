@@ -66,6 +66,62 @@ My article contents...
 All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
 You can omit passing any options to the plugin when matching based on a `collection` property.
 
+### Dynamic collections
+
+Dynamic collections group files by matching path segments.
+
+```js
+metasmith.use(collections({
+  departments: {
+    pattern: ':department/:team/*.md'
+  }
+}));
+```
+
+Each `:symbol` is set to the matching path segment. Use `this` to iterate over nested collections:
+
+```hbs
+{{#each departments}}
+  Department: {{department}}
+
+  {{#each this}}
+    Team: {{team}}
+
+    {{#each this}}
+      {{{contents}}}
+    {{/each}}
+  {{/each}}
+{{/each}}
+```
+
+Dynamic collections can also be referenced directly by name:
+
+`engineering/software/alice.md`:
+```markdown
+---
+fullName: Alice Smith
+---
+
+Contents of file...
+```
+```hbs
+{{#each departments.engineering.software}}
+  Employee: {{fullName}}
+  {{{contents}}}
+{{/each}}
+```
+
+Dynamic collections can also be used via frontmatter:
+
+`some/other/directory/bob.md`:
+```markdown
+---
+collection: departments.engineering.hardware
+---
+
+Contents of file...
+```
+
 ### Collection Metadata
 
 Additional metadata can be added to the collection object.
