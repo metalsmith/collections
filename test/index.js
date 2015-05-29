@@ -13,6 +13,7 @@ describe('metalsmith-collections', function(){
         var m = metalsmith.metadata();
         assert.equal(2, m.articles.length);
         assert.equal(m.collections.articles, m.articles);
+        assert.equal('one', m.articles[0].fileBase)
         done();
       });
   });
