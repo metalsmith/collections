@@ -203,6 +203,22 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should "exclude" files based on a pattern', function(done){
+    var metalsmith = Metalsmith('test/fixtures/exclude');
+    metalsmith
+      .use(collections({
+        articles: {
+          pattern: '*.md',
+          exclude: 'one.md'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        assert.equal(2, metalsmith.metadata().articles.length);
+        done();
+      });
+  });
+
   it('should add metadata objects to collections', function (done) {
     var metalsmith = Metalsmith('test/fixtures/basic');
     metalsmith
