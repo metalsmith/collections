@@ -45,6 +45,19 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should take a pattern regex', function(done){
+    var metalsmith = Metalsmith('test/fixtures/pattern');
+    metalsmith
+      .use(collections({
+        articles: /^(one|three)\.md$/
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        assert.equal(2, metalsmith.metadata().articles.length);
+        done();
+      });
+  });
+
   it('should add the collection property to a file', function(done){
     var metalsmith = Metalsmith('test/fixtures/pattern');
     metalsmith
