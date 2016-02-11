@@ -72,6 +72,8 @@ collection:
     - articles
     - news
 date: 2016-02-11
+
+My article contents...
 ```
 
 All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
