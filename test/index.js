@@ -301,4 +301,22 @@ describe('metalsmith-collections', function(){
         done();
       });
   });
+
+  it('should add file path', function(done){
+    var metalsmith = Metalsmith('test/fixtures/sort');
+    metalsmith
+      .use(collections({
+        articles: {
+          sortBy: 'title'
+        }
+      }))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert(articles[0].path);
+        assert.equal(articles[0].path, 'one.md');
+        done();
+      });
+  });
+
 });
