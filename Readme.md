@@ -37,6 +37,7 @@ Which is just a shorthand. You could also add additional options:
 metalsmith.use(collections({
   articles: {
     pattern: '*.md',
+    exclude: 'index.md',
     sortBy: 'date',
     reverse: true
   }
