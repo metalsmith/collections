@@ -18,7 +18,7 @@ A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you gro
 
 There are two ways to create collections:
 
-  - **by pattern** - this is just passing a globing pattern that will group any files that match into the same collection.
+  - **by pattern** - this is just passing a globing pattern that will group any files that match into the same collection. The passed pattern can be a single pattern (as a string) or an array of globing patterns. For more information read the [multimatch patterns documentation](https://www.npmjs.com/package/multimatch#how-multiple-patterns-work).
   - **by metadata** - this is adding a specific `collection` metadata field to each item that you want to add to a collection.
 
 The simplest way to create a collection is to use a pattern to match the files you want to group together:

@@ -6,14 +6,18 @@
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
-    "debug": "~0.7.4",
-    "extend": "~1.2.1",
-    "minimatch": "^0.2.14",
-    "uniq": "0.0.2",
-    "read-metadata": "0.0.2"
+    "debug": "^2.2.0",
+    "extend": "^3.0.0",
+    "multimatch": "^2.1.0",
+    "read-metadata": "^1.0.0",
+    "uniq": "^1.0.1"
   },
   "devDependencies": {
-    "metalsmith": "0.x",
-    "mocha": "1.x"
+    "metalsmith": "2.x",
+    "mocha": "^3.1.2"
+  },
+  "scripts": {
+    "pretest": "npm install --silent --progress=false",
+    "test": "mocha --reporter spec"
   }
 }
