@@ -128,6 +128,22 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should accept a "filter" function', function(done){
+    var metalsmith = Metalsmith('test/fixtures/filter');
+    metalsmith
+      .use(collections({ articles: { filter: filter } }))
+      .build(function(err){
+        if (err) return done(err);
+        assert.equal(1, metalsmith.metadata().articles.length);
+        done();
+      });
+
+    function filter(a){
+      a = a.title[0];
+      return a.toLowerCase() === 'a';
+    }
+  });
+
   it('should accept a "limit" option', function (done){
     var metalsmith = Metalsmith('test/fixtures/limit'),
         limit = 2;

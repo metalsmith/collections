@@ -113,6 +113,22 @@ metalsmith.use(collections({
 }));
 ```
 
+A collection can use a `filter` option, defined as a function, to yield a more specific result based on metadata.
+
+```js
+metalsmith.use(collections({
+  featured: {
+    pattern: '*.md',
+    sortBy: 'date',
+    filter: publishedThisWeek
+  }
+}));
+
+function publishedThisWeek(metadata) {
+  return moment(metadata.date).isSame(moment(), 'week');
+}
+```
+
 By adding `refer: false` to your options, it will skip adding the "next" and
 "previous" links to your articles.
 
