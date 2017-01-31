@@ -27,7 +27,7 @@ describe('metalsmith-collections', function(){
       }))
       .build(function(err){
         if (err) return done(err);
-        assert.equal(3, metalsmith.metadata().articles.length);
+        assert.equal(4, metalsmith.metadata().articles.length);
         done();
       });
   });
@@ -40,7 +40,24 @@ describe('metalsmith-collections', function(){
       }))
       .build(function(err){
         if (err) return done(err);
-        assert.equal(3, metalsmith.metadata().articles.length);
+        assert.equal(4, metalsmith.metadata().articles.length);
+          done();
+        });
+    });
+
+    it('should take an array of patterns', function(done){
+      var metalsmith = Metalsmith('test/fixtures/pattern');
+      metalsmith
+        .use(collections({
+          blogs: ['*.md', '!one.md', '!two.md', '!four.md'],
+          pages: { pattern: ['four.md'] }
+        }))
+        .build(function(err, files){
+          if (err) return done(err);
+          assert.equal(1, metalsmith.metadata().blogs.length, 'length blogs');
+          assert.equal(1, metalsmith.metadata().pages.length, 'length page');
+          assert.equal(files['three.md'].collection, 'blogs', 'collection blogs');
+          assert.equal(files['four.md'].collection, 'pages', 'collection page');
         done();
       });
   });
