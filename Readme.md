@@ -72,6 +72,31 @@ Adds a `path` property to the collection item's data which contains the file pat
 <h1><a href="/{{ path }}">{{ title }}</a></h1>
 ```
 
+The sorting method can be overridden with a custom function in order to sort the files in any order you prefer. For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
+
+```js
+metalsmith.use(collections({
+    subpages: {
+        sortBy: function (a, b) {
+            var aNum, bNum;
+            
+            aNum = +a.index;
+            bNum = +b.index;
+            
+            // Test for NaN
+            if (aNum != aNum && bNum != bNum) return 0;
+            if (aNum != aNum) return 1;
+            if (bNum != bNum) return -1;
+            
+            // Normal comparison, want lower numbers first
+            if (aNum > bNum) return 1;
+            if (bNum > aNum) return -1;
+            return 0;
+        }
+    }
+}));
+```
+
 ### Collection Metadata
 
 Additional metadata can be added to the collection object.
