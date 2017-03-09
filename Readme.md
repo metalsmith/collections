@@ -72,6 +72,18 @@ Adds a `path` property to the collection item's data which contains the file pat
 <h1><a href="/{{ path }}">{{ title }}</a></h1>
 ```
 
+You can also assign multiple collections by comma-separating the list:
+```markdown
+---
+title: My Article
+collection: articles, featured
+date: 2013-02-21
+---
+
+My article contents...
+```
+
+
 ### Collection Metadata
 
 Additional metadata can be added to the collection object.
