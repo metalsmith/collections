@@ -73,7 +73,9 @@ Adds a `path` property to the collection item's data which contains the file pat
 <h1><a href="/{{ path }}">{{ title }}</a></h1>
 ```
 
-If you need even more granular control over which files are added to your collection, you can pass a filter function to the `filterBy` option. This option allows you to filter out files based on their metadata. For example, to only add articles published after 2002 to the collection:
+If you need even more granular control over which files are added to your collection, you can pass a filter function to the `filterBy` option. This option allows you to filter out files based on their metadata.
+
+For example, to only add articles published after 2002 to the collection:
 
 ```js
 metalsmith.use(collections({
