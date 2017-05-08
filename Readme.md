@@ -7,6 +7,7 @@ A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you gro
   - can match files by `collection` metadata
   - can match files by pattern
   - can limit the number of files in a collection
+  - can filter files in a collection based on metadata
   - adds collections to global metadata
   - adds `next` and `previous` references to each file in the collection
 
@@ -71,6 +72,24 @@ Adds a `path` property to the collection item's data which contains the file pat
 ```html
 <h1><a href="/{{ path }}">{{ title }}</a></h1>
 ```
+
+If you need even more granular control over which files are added to your collection, you can pass a filter function to the `filterBy` option. This option allows you to filter out files based on their metadata. For example, to only add articles published after 2002 to the collection:
+
+```js
+metalsmith.use(collections({
+  articles: {
+    pattern: '*.md',
+    sortBy: 'date',
+    reverse: true,
+    filterBy: function(articleMeta) {
+      var articleDate = new Date(articleMeta.date);
+      return (articleDate.getFullYear() > 2002);
+    },
+  }
+}));
+```
+
+The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added.
 
 ### Collection Metadata
 
