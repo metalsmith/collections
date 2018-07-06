@@ -1,6 +1,6 @@
 # metalsmith-collections
 
-A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you group files together into an ordered collection, like blog posts. That way you can loop over them to generate an index, or add 'next' and 'previous' links between them.
+A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you group files together into an ordered collection, like blog posts. That way you can loop over them to generate an index, or add 'next', 'previous', 'newer' and 'older' links between them.
 
 ## Features
 
@@ -9,6 +9,7 @@ A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you gro
   - can limit the number of files in a collection
   - adds collections to global metadata
   - adds `next` and `previous` references to each file in the collection
+  - adds `newer` and `older` references to each file in the collection
 
 ## Installation
 
@@ -120,6 +121,17 @@ By adding `refer: false` to your options, it will skip adding the "next" and
 metalsmith.use(collections({
   articles: {
     refer: false
+  }
+}));
+```
+
+By adding `chronologicalRefer: false` to your options, it will skip adding the "newer" and
+"older" links to your articles.
+
+```js
+metalsmith.use(collections({
+  articles: {
+    chronologicalRefer: false
   }
 }));
 ```
