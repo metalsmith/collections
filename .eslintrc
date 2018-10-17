@@ -1,0 +1,25 @@
+root: true
+
+env:
+  node: true
+
+parserOptions:
+  ecmaVersion: 2017
+  sourceType: module
+  ecmaFeatures:
+    globalReturn: true
+    impliedStrict: true
+
+extends:
+  - "eslint:recommended"
+  - "prettier"
+
+plugins:
+  - "prettier"
+
+rules:
+  "prettier/prettier": "error"
+  camelcase: 0
+  no-console: 1
+  quotes: [2, "single", "avoid-escape"]
+  valid-jsdoc: [1, {requireParamDescription: false, requireReturnDescription: false}]
