@@ -6,18 +6,27 @@
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
-    "debug": "^2.6.0",
+    "debug": "^4.1.0",
     "extend": "^3.0.0",
     "multimatch": "^2.1.0",
     "read-metadata": "^1.0.0",
     "uniq": "^1.0.1"
   },
   "devDependencies": {
-    "metalsmith": "2.x",
-    "mocha": "^3.2.0"
+    "eslint": "^5.7.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "metalsmith": "^2.3.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.4",
+    "prettier": "^1.14.3"
   },
   "scripts": {
-    "pretest": "npm install --silent --progress=false",
-    "test": "mocha --reporter spec"
+    "pretest": "npm run lint",
+    "test": "mocha test",
+    "lint": "eslint --cache --fix .",
+    "dev": "nodemon --exec 'npm test'",
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags && npm publish"
   }
 }
