@@ -1,7 +1,15 @@
-1.0.0 / ????-??-??
+1.0.0 / 2018-10-17
 ==================
 
-* Removed `path` from metadata. Instead use: metalsmith-path or metalsmith-paths
+- Fixed API and merged many PRs
+- Allow metadata-based filtering with `filterBy` option
+- removed unused module
+- Add documentation: `sortBy` can be a function
+- display only matching files when debugging
+- assign data.path where undefined
+- Clear collections
+- Added multiple collections syntax to Readme.md
+
 
 0.7.0 / 2015-02-07
 ==================
