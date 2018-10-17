@@ -79,12 +79,6 @@ My article contents...
 All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
 You can omit passing any options to the plugin when matching based on a `collection` property.
 
-Adds a `path` property to the collection item's data which contains the file path of the generated file. For example, this can be used in mustache templates to create links:
-
-```html
-<h1><a href="/{{ path }}">{{ title }}</a></h1>
-```
-
 ### Collection Metadata
 
 Additional metadata can be added to the collection object.

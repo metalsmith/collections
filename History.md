@@ -1,3 +1,7 @@
+1.0.0 / ????-??-??
+==================
+
+* Removed `path` from metadata. Instead use: metalsmith-path or metalsmith-paths
 
 0.7.0 / 2015-02-07
 ==================
