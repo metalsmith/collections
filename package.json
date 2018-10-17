@@ -2,11 +2,11 @@
   "name": "metalsmith-collections",
   "description": "A Metalsmith plugin that adds collections of files to the global metadata.",
   "repository": "git://github.com/segmentio/metalsmith-collections.git",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "^2.6.0",
     "extend": "^3.0.0",
     "multimatch": "^2.1.0",
     "read-metadata": "^1.0.0",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "metalsmith": "2.x",
-    "mocha": "^3.1.2"
+    "mocha": "^3.2.0"
   },
   "scripts": {
     "pretest": "npm install --silent --progress=false",
