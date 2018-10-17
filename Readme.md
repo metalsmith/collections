@@ -7,6 +7,7 @@ A [Metalsmith](https://github.com/segmentio/metalsmith) plugin that lets you gro
   - can match files by `collection` metadata
   - can match files by pattern
   - can limit the number of files in a collection
+  - can filter files in a collection based on metadata
   - adds collections to global metadata
   - adds `next` and `previous` references to each file in the collection
 
@@ -109,6 +110,8 @@ metalsmith.use(collections({
     }
 }));
 ```
+
+The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added.
 
 ### Collection Metadata
 
