@@ -336,4 +336,25 @@ describe('metalsmith-collections', function(){
       });
   });
 
+  it('should accept a "filterBy" function', function(done){
+    var metalsmith = Metalsmith('test/fixtures/filter');
+    metalsmith
+      .use(collections({ articles: { filterBy: function(articleMeta) {
+        if (articleMeta.date) {
+          var articleDate = new Date(articleMeta.date);
+          return (articleDate.getFullYear() > 2011);
+        }
+        return false;
+      } }}))
+      .build(function(err){
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal(1, articles.length);
+        var articleDate = new Date(articles[0].date);
+        assert.equal(true, articleDate instanceof Date);
+        assert.equal(2014, articleDate.getFullYear());
+        done();
+      });
+  });
+
 });
