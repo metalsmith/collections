@@ -96,6 +96,20 @@ describe('metalsmith-collections', function() {
       });
   });
 
+  it('should accept a "sortBy" nested properties', function(done) {
+    var metalsmith = Metalsmith('test/fixtures/sort');
+    metalsmith
+      .use(collections({ articles: { sortBy: 'nested.props.order' } }))
+      .build(function(err) {
+        if (err) return done(err);
+        var articles = metalsmith.metadata().articles;
+        assert.equal('Alpha', articles[0].title);
+        assert.equal('Beta', articles[1].title);
+        assert.equal('Gamma', articles[2].title);
+        done();
+      });
+  });
+
   it('should accept a "sortBy" function', function(done) {
     var metalsmith = Metalsmith('test/fixtures/sort');
     metalsmith
