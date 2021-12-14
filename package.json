@@ -19,9 +19,9 @@
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
-    "debug": "^4.1.0",
+    "debug": "^4.3.3",
     "extend": "^3.0.0",
-    "multimatch": "^2.1.0",
+    "multimatch": "^4.0.0",
     "read-metadata": "^1.0.0",
     "uniq": "^1.0.1"
   },
