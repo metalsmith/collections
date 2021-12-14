@@ -49,7 +49,7 @@
     "test": "nyc mocha",
     "coverage": "nyc report --reporter=text-lcov > ./coverage.info",
     "coveralls": "npm run coverage && cat ./coverage.info | coveralls",
-    "format": "prettier --write .",
+    "format": "prettier --write \"**/*.{yml,md,js,json}\"",
     "lint": "eslint --cache --fix-dry-run .",
     "dev": "nodemon --exec 'npm test'",
     "release": "release-it ."

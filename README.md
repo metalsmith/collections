@@ -7,6 +7,7 @@ A [Metalsmith](https://github.com/metalsmith/metalsmith) plugin that lets you gr
 [![ci: build][ci-badge]][ci-url]
 [![code coverage][codecov-badge]][codecov-url]
 [![license: MIT][license-badge]][license-url]
+
 ## Features
 
 - can match files by `collection` metadata
@@ -40,13 +41,13 @@ There are two ways to create collections (they can be used together):
 The simplest way to create a collection is to use a pattern to match the files you want to group together:
 
 ```js
-const collections = require('@metalsmith/collections');
+const collections = require('@metalsmith/collections')
 
 metalsmith.use(
   collections({
     articles: '*.md'
   })
-);
+)
 ```
 
 Which is just a shorthand. You could also add additional options:
@@ -60,7 +61,7 @@ metalsmith.use(
       reverse: true
     }
   })
-);
+)
 ```
 
 But you can also match based on a `collection` property in each file's metadata by omitting a pattern, and adding the property to your files:
@@ -73,7 +74,7 @@ metalsmith.use(
       reverse: true
     }
   })
-);
+)
 ```
 
 ```markdown
@@ -116,24 +117,24 @@ metalsmith.use(
   collections({
     subpages: {
       sortBy: function(a, b) {
-        let aNum, bNum;
+        let aNum, bNum
 
-        aNum = +a.index;
-        bNum = +b.index;
+        aNum = +a.index
+        bNum = +b.index
 
         // Test for NaN
-        if (aNum != aNum && bNum != bNum) return 0;
-        if (aNum != aNum) return 1;
-        if (bNum != bNum) return -1;
+        if (aNum != aNum && bNum != bNum) return 0
+        if (aNum != aNum) return 1
+        if (bNum != bNum) return -1
 
         // Normal comparison, want lower numbers first
-        if (aNum > bNum) return 1;
-        if (bNum > aNum) return -1;
-        return 0;
+        if (aNum > bNum) return 1
+        if (bNum > aNum) return -1
+        return 0
       }
     }
   })
-);
+)
 ```
 
 The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added.
@@ -154,7 +155,7 @@ metalsmith.use(
       }
     }
   })
-);
+)
 ```
 
 Collection metadata can also be assigned from a `json` or `yaml` file.
@@ -168,7 +169,7 @@ metalsmith.use(
       metadata: 'path/to/file.json'
     }
   })
-);
+)
 ```
 
 On each collection definition, it's possible to add a `limit` option so that the
@@ -182,7 +183,7 @@ metalsmith.use(
       limit: 10
     }
   })
-);
+)
 ```
 
 By adding `refer: false` to your options, it will skip adding the "next" and
@@ -195,7 +196,7 @@ metalsmith.use(
       refer: false
     }
   })
-);
+)
 ```
 
 ### Debug
@@ -203,17 +204,20 @@ metalsmith.use(
 To log debug output, set the `DEBUG` environment variable to `{{ plugin.name }}`:
 
 Linux/Mac:
+
 ```sh
 DEBUG=@metalsmith/collections
 ```
+
 Windows:
+
 ```cmd
 set "DEBUG=@metalsmith/collections"
 ```
 
 ## CLI Usage
 
-Add the `@metalsmith/collections` key to your   `metalsmith.json` `plugins` key:
+Add the `@metalsmith/collections` key to your `metalsmith.json` `plugins` key:
 
 ```json
 {
