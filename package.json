@@ -45,7 +45,7 @@
     "lib/*"
   ],
   "scripts": {
-    "changelog": "auto-changelog -u --sort-commits date --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '(skip changelog|Release)'",
+    "changelog": "auto-changelog -u --starting-date 2021-12-01 --sort-commits date-desc --commit-limit false --ignore-commit-pattern '(dev|Release|Merge)'",
     "test": "nyc mocha",
     "coverage": "nyc report --reporter=text-lcov > ./coverage.info",
     "coveralls": "npm run coverage && cat ./coverage.info | coveralls",
