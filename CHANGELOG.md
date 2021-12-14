@@ -10,7 +10,6 @@
 - Clear collections
 - Added multiple collections syntax to Readme.md
 
-
 0.7.0 / 2015-02-07
 ==================
 

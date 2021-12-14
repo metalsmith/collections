@@ -1,7 +1,21 @@
 language: node_js
+dist: xenial
+
 node_js:
-  - "node"
-  - "9"
-  - "8"
-  - "7"
-  - "6"
+  - node
+  - 16
+  - 12
+  - 8
+
+os:
+  - linux
+  - windows
+
+jobs:
+  include:
+    - name: lint
+      script: npm run lint
+    - name: coveralls
+      script: npm run test && npm run coveralls
+
+script: npm run test

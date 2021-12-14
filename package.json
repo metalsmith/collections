@@ -1,7 +1,20 @@
 {
-  "name": "metalsmith-collections",
+  "name": "@metalsmith/collections",
   "description": "A Metalsmith plugin that adds collections of files to the global metadata.",
-  "repository": "git://github.com/segmentio/metalsmith-collections.git",
+  "keywords": [
+    "collections",
+    "metalsmith",
+    "metalsmith-plugin",
+    "static-site"
+  ],
+  "homepage": "https://github.com/metalsmith/collections#readme",
+  "bugs": {
+    "url": "https://github.com/metalsmith/collections/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metalsmith/collections.git"
+  },
   "version": "1.0.0",
   "license": "MIT",
   "main": "lib/index.js",
@@ -13,20 +26,41 @@
     "uniq": "^1.0.1"
   },
   "devDependencies": {
-    "eslint": "^5.7.0",
-    "eslint-config-prettier": "^3.1.0",
-    "eslint-plugin-prettier": "^3.0.0",
+    "auto-changelog": "^2.3.0",
+    "coveralls": "^3.1.1",
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.3.0",
     "metalsmith": "^2.3.0",
-    "mocha": "^5.2.0",
+    "mocha": "^7.2.0",
     "nodemon": "^1.18.4",
-    "prettier": "^1.14.3"
+    "nyc": "^15.1.0",
+    "prettier": "^1.19.1",
+    "release-it": "^14.11.8"
   },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "files": [
+    "lib/*"
+  ],
   "scripts": {
-    "pretest": "npm run lint",
-    "test": "mocha test",
-    "lint": "eslint --cache --fix .",
+    "changelog": "auto-changelog -u --sort-commits date --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '(skip changelog|Release)'",
+    "test": "nyc mocha",
+    "coverage": "nyc report --reporter=text-lcov > ./coverage.info",
+    "coveralls": "npm run coverage && cat ./coverage.info | coveralls",
+    "format": "prettier --write .",
+    "lint": "eslint --cache --fix-dry-run .",
     "dev": "nodemon --exec 'npm test'",
-    "preversion": "npm test",
-    "postversion": "git push && git push --tags && npm publish"
+    "release": "release-it ."
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "metalsmith": "^2.3.0"
+  },
+  "engines": {
+    "node": ">=8"
   }
 }

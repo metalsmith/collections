@@ -1,10 +1,9 @@
-/* eslint-env mocha */
+const assert = require('assert');
+const { it, describe } = require('mocha');
+const Metalsmith = require('metalsmith');
+const collections = require('..');
 
-var assert = require('assert');
-var Metalsmith = require('metalsmith');
-var collections = require('..');
-
-describe('metalsmith-collections', function() {
+describe('@metalsmith/collections', function() {
   it('should add collections to metadata', function(done) {
     var metalsmith = Metalsmith('test/fixtures/basic');
     metalsmith.use(collections({ articles: {} })).build(function(err) {
