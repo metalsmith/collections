@@ -81,7 +81,7 @@ metalsmith.use(
 ---
 title: My Article
 collection: articles
-date: 2013-02-21
+date: 2021-12-01
 ---
 
 My article contents...
@@ -201,7 +201,7 @@ metalsmith.use(
 
 ### Debug
 
-To log debug output, set the `DEBUG` environment variable to `{{ plugin.name }}`:
+To log debug output, set the `DEBUG` environment variable to `@metalsmith/collections`:
 
 Linux/Mac:
 
@@ -244,7 +244,7 @@ Add the `@metalsmith/collections` key to your `metalsmith.json` `plugins` key:
 [ci-url]: https://app.travis-ci.com/github/metalsmith/collections
 [metalsmith-badge]: https://img.shields.io/badge/metalsmith-plugin-green.svg?longCache=true
 [metalsmith-url]: http://metalsmith.io
-[codecov-badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg
-[codecov-url]: https://github.com/prettier/prettier
+[codecov-badge]: https://img.shields.io/coveralls/github/metalsmith/collections
+[codecov-url]: https://coveralls.io/github/metalsmith/collections
 [license-badge]: https://img.shields.io/github/license/metalsmith/collections
 [license-url]: LICENSE
