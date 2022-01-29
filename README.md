@@ -93,7 +93,7 @@ There are 2 ways to create collections & they can be used together:
       news: {
         metadata: {
           title: 'Latest news',
-          description: 'All the latest in politics & world news'
+          description: 'All the latest in politics & world news',
           slug: 'news'
         },
         pattern: 'news/**/*.html',
@@ -147,7 +147,7 @@ Here is an example of using [@metalsmith/layouts](https://github.com/metalsmith/
 
 ```handlebars
 <h1>{{ title }}</h1> {{!-- something-happened.md title --}}
-<a href="/{{ collections.news.slug }}">Back to news</a> {{!-- news collection metadata.slug --}}
+<a href="/{{ collections.news.metadata.slug }}">Back to news</a> {{!-- news collection metadata.slug --}}
 {{ contents | safe }}
 <hr>
 {{!-- previous & next are added by @metalsmith/collections --}}
@@ -260,7 +260,7 @@ metalsmith.use(
     news: {
       metadata: {
         title: 'Latest news',
-        description: 'All the latest in politics & world news'
+        description: 'All the latest in politics & world news',
         slug: 'news'
       }
     }
