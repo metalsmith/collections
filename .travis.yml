@@ -14,7 +14,7 @@ stages:
   - lint
   - test_windows
   - test
-  - codecov  
+  - codecov
 
 jobs:
   include:
