@@ -2,13 +2,35 @@ const assert = require('assert')
 const { it, describe } = require('mocha')
 const Metalsmith = require('metalsmith')
 const collections = require('..')
+const { name } = require('../package.json')
 
 describe('@metalsmith/collections', function() {
+  it('should export a named plugin function matching package.json name', function() {
+    const namechars = name.split('/')[1]
+    const camelCased = namechars.split('')
+      .reduce((str, char, i) => {
+        str += namechars[i - 1] === '-' ? char.toUpperCase() : char === '-' ? '' : char
+        return str
+      }, '')
+    assert.strictEqual(collections().name, camelCased)
+  })
+  it('should not crash the metalsmith build when using default options', function(done) {
+    const metalsmith = Metalsmith('test/fixtures/noconfig')
+    metalsmith
+      .use(collections())
+      .build(err => {
+        const m = metalsmith.metadata()
+        assert.strictEqual(err, null)
+        assert.equal(2, m.books.length)
+        assert.equal(1, m.movies.length)
+        done()
+      })
+  })
   it('should add collections to metadata', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/basic')
     metalsmith.use(collections({ articles: {} })).build(function(err) {
       if (err) return done(err)
-      var m = metalsmith.metadata()
+      const m = metalsmith.metadata()
       assert.equal(2, m.articles.length)
       assert.equal(m.collections.articles, m.articles)
       done()
@@ -16,7 +38,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should match collections by pattern', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/pattern')
+    const metalsmith = Metalsmith('test/fixtures/pattern')
     metalsmith
       .use(
         collections({
@@ -33,7 +55,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should take a pattern shorthand string', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/pattern')
+    const metalsmith = Metalsmith('test/fixtures/pattern')
     metalsmith
       .use(
         collections({
@@ -48,7 +70,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should take an array of patterns', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/pattern')
+    const metalsmith = Metalsmith('test/fixtures/pattern')
     metalsmith
       .use(
         collections({
@@ -67,7 +89,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should add the collection property to a file', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/pattern')
+    const metalsmith = Metalsmith('test/fixtures/pattern')
     metalsmith
       .use(
         collections({
@@ -82,10 +104,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "sortBy" option', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/sort')
+    const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith.use(collections({ articles: { sortBy: 'title' } })).build(function(err) {
       if (err) return done(err)
-      var articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().articles
       assert.equal('Alpha', articles[0].title)
       assert.equal('Beta', articles[1].title)
       assert.equal('Gamma', articles[2].title)
@@ -94,10 +116,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "sortBy" function', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/sort')
+    const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith.use(collections({ articles: { sortBy: sort } })).build(function(err) {
       if (err) return done(err)
-      var articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().articles
       assert.equal('Gamma', articles[0].title)
       assert.equal('Beta', articles[1].title)
       assert.equal('Alpha', articles[2].title)
@@ -112,7 +134,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "reverse" option', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/sort')
+    const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith
       .use(
         collections({
@@ -124,7 +146,7 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert.equal('Alpha', articles[2].title)
         assert.equal('Beta', articles[1].title)
         assert.equal('Gamma', articles[0].title)
@@ -133,7 +155,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "limit" option', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/limit'),
+    const metalsmith = Metalsmith('test/fixtures/limit'),
       limit = 2
     metalsmith
       .use(
@@ -146,7 +168,7 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert.equal(limit, articles.length)
         assert.equal('Alpha', articles[0].title)
         assert.equal('Beta', articles[1].title)
@@ -155,7 +177,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "limit" higher than the collection length', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/limit')
+    const metalsmith = Metalsmith('test/fixtures/limit')
     metalsmith
       .use(
         collections({
@@ -167,7 +189,7 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert.equal(3, articles.length)
         assert.equal('Alpha', articles[0].title)
         assert.equal('Beta', articles[1].title)
@@ -177,10 +199,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should add next and previous references', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/references')
+    const metalsmith = Metalsmith('test/fixtures/references')
     metalsmith.use(collections({ articles: {} })).build(function(err) {
       if (err) return done(err)
-      var articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().articles
       assert(!articles[0].previous)
       assert.equal(articles[0].next, articles[1])
       assert.equal(articles[1].previous, articles[0])
@@ -192,10 +214,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should not add references if opts[key].refer === false', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/references-off')
+    const metalsmith = Metalsmith('test/fixtures/references-off')
     metalsmith.use(collections({ articles: { refer: false } })).build(function(err) {
       if (err) return done(err)
-      var articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().articles
       assert(!articles[0].previous)
       assert(!articles[0].next)
       assert(!articles[1].previous)
@@ -207,7 +229,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should not fail with empty collections', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/empty')
+    const metalsmith = Metalsmith('test/fixtures/empty')
     metalsmith
       .use(
         collections({
@@ -219,14 +241,14 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert.equal(articles.length, 0)
         done()
       })
   })
 
   it('should add metadata objects to collections', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/basic')
     metalsmith
       .use(
         collections({
@@ -237,14 +259,14 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var m = metalsmith.metadata()
+        const m = metalsmith.metadata()
         assert.equal('Batman', m.articles.metadata.name)
         done()
       })
   })
 
   it('should load collection metadata from a JSON file', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/basic')
     metalsmith
       .use(
         collections({
@@ -255,14 +277,14 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var m = metalsmith.metadata()
+        const m = metalsmith.metadata()
         assert.equal('Batman', m.articles.metadata.name)
         done()
       })
   })
 
   it('should load collection metadata from a YAML file', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/basic')
     metalsmith
       .use(
         collections({
@@ -273,17 +295,17 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var m = metalsmith.metadata()
+        const m = metalsmith.metadata()
         assert.equal('Batman', m.articles.metadata.name)
         done()
       })
   })
 
   it('should allow multiple collections', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/multi')
+    const metalsmith = Metalsmith('test/fixtures/multi')
     metalsmith.use(collections({ articles: {}, posts: {}, drafts: {} })).build(function(err) {
       if (err) return done(err)
-      var m = metalsmith.metadata()
+      const m = metalsmith.metadata()
       assert.equal(2, m.articles.length)
       assert.equal(1, m.drafts.length)
       assert.equal(1, m.posts.length)
@@ -295,10 +317,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should allow collections through metadata alone', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/noconfig')
+    const metalsmith = Metalsmith('test/fixtures/noconfig')
     metalsmith.use(collections({ movies: {} })).build(function(err) {
       if (err) return done(err)
-      var m = metalsmith.metadata()
+      const m = metalsmith.metadata()
       assert.equal(2, m.books.length)
       assert.equal(1, m.movies.length)
       assert.equal(m.collections.books, m.books)
@@ -308,10 +330,10 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should allow collections by pattern and front matter', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/multi')
+    const metalsmith = Metalsmith('test/fixtures/multi')
     metalsmith.use(collections({ articles: {}, posts: {}, drafts: {}, blog: '*.md' })).build(function(err) {
       if (err) return done(err)
-      var m = metalsmith.metadata()
+      const m = metalsmith.metadata()
       assert.equal(3, m.blog.length)
       assert.equal(2, m.articles.length)
       assert.equal(1, m.drafts.length)
@@ -325,7 +347,7 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should add file path', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/sort')
+    const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith
       .use(
         collections({
@@ -336,7 +358,7 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert(articles[0].path)
         assert.equal(articles[0].path, 'one.md')
         done()
@@ -344,14 +366,14 @@ describe('@metalsmith/collections', function() {
   })
 
   it('should accept a "filterBy" function', function(done) {
-    var metalsmith = Metalsmith('test/fixtures/filter')
+    const metalsmith = Metalsmith('test/fixtures/filter')
     metalsmith
       .use(
         collections({
           articles: {
             filterBy: function(articleMeta) {
               if (articleMeta.date) {
-                var articleDate = new Date(articleMeta.date)
+                const articleDate = new Date(articleMeta.date)
                 return articleDate.getFullYear() > 2011
               }
               return false
@@ -361,9 +383,9 @@ describe('@metalsmith/collections', function() {
       )
       .build(function(err) {
         if (err) return done(err)
-        var articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().articles
         assert.equal(1, articles.length)
-        var articleDate = new Date(articles[0].date)
+        const articleDate = new Date(articles[0].date)
         assert.equal(true, articleDate instanceof Date)
         assert.equal(2014, articleDate.getFullYear())
         done()

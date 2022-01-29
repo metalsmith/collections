@@ -6,3 +6,5 @@ extends:
   - 'prettier'
 parserOptions:
   ecmaVersion: 2017
+rules:
+  prefer-const: 2
