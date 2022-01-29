@@ -1,6 +1,6 @@
 # @metalsmith/collections
 
-A [Metalsmith](https://github.com/metalsmith/metalsmith) plugin that lets you group files together into an ordered collection, like blog posts. That way you can loop over them to generate an index, or add 'next' and 'previous' links between them.
+A Metalsmith plugin that lets you group files together into ordered collections, like blog posts. That way you can loop over them to generate index pages, add 'next' and 'previous' links between them, and more
 
 [![metalsmith: core plugin][metalsmith-badge]][metalsmith-url]
 [![npm version][npm-badge]][npm-url]
@@ -10,10 +10,10 @@ A [Metalsmith](https://github.com/metalsmith/metalsmith) plugin that lets you gr
 
 ## Features
 
-- can match files by `collection` metadata
+- can match files by `collection` file metadata
 - can match files by pattern
 - can limit the number of files in a collection
-- can filter files in a collection based on metadata
+- can filter files in a collection based on file metadata
 - adds collections to global metadata
 - adds `next` and `previous` references to each file in the collection
 
@@ -21,96 +21,175 @@ A [Metalsmith](https://github.com/metalsmith/metalsmith) plugin that lets you gr
 
 NPM:
 
-```
+```bash
 npm install @metalsmith/collections
 ```
 
 Yarn:
 
-```
+```bash
 yarn add @metalsmith/collections
 ```
 
 ## Usage
 
-There are two ways to create collections (they can be used together):
-
-- **by pattern** - this is just passing a globbing pattern that will group any files that match into the same collection. The passed pattern can be a single pattern (as a string) or an array of globing patterns. For more information read the [multimatch patterns documentation](https://www.npmjs.com/package/multimatch#how-multiple-patterns-work).
-- **by metadata** - this is adding a specific `collection` metadata field to each item that you want to add to a collection.
-
-The simplest way to create a collection is to use a pattern to match the files you want to group together:
+Pass options to `@metalsmith/collections` in the plugin chain: 
 
 ```js
+const Metalsmith = require('metalsmith')
+const markdown = require('@metalsmith/markdown')
 const collections = require('@metalsmith/collections')
 
-metalsmith.use(
-  collections({
-    articles: '*.md'
+// defaults, only create collections based on file metadata
+Metalsmith(__dirname)
+  .use(markdown())
+  .use(collections())
+
+// defaults for a "news" collection, except pattern option
+Metalsmith(__dirname)
+  .use(markdown())
+  .use(collections({
+    news: { pattern: 'news/**/*.html' }
+  }))
+
+// explicit defaults for a "news" collection, except pattern option
+Metalsmith(__dirname)
+  .use(markdown())
+  .use(collections({
+    pattern: { pattern: 'news/**/*.html' },
+    metadata: null,
+    filterBy: () => true,
+    sortBy: defaultSort,
+    reverse: false,
+    limit: Infinity,
+    refer: true
   })
-)
 ```
 
-Which is just a shorthand. You could also add additional options:
+*Note: all examples in the readme use the same collections definitions under [Defining collections](#defining-collections)*
 
-```js
-metalsmith.use(
-  collections({
-    articles: {
-      pattern: '*.md',
-      sortBy: 'date',
-      reverse: true
-    }
-  })
-)
+### Options
+
+All options are *optional*
+
+* **pattern** `string|string[]` - one or more glob patterns to group files into a collection
+* **filterBy** `Function` - a function that returns `false` for files that should be filtered *out* of the collection
+* **limit** `number` - restrict the number of files in a collection to at most `limit`
+* **sortBy** `string|Function` - a file metadata key to sort by (for example `date` or `pubdate` or `title`), or a custom sort function
+* **reverse** `boolean` - whether the sort should be reversed (e.g., for a news/blog collection, you typically want `reverse: true`)
+* **metadata** `Object|string` - metadata to attach to the collection. Will be available as `metalsmith.metadata().collections.<name>.metadata`. This can be used for example to attach metadata for index pages. *If a string is passed, it will be interpreted as a file path to an external `JSON` or `YAML` metadata file*
+* **refer** `boolean` - will add `previous` and `next` keys to each file in a collection. `true` by default
+
+### Defining collections
+
+There are 2 ways to create collections & they can be used together:
+
+- **by pattern** - for example, this is how you would create multiple pattern-based collections, based on the folders `photos`, `news`, and `services`:
+
+  ```js
+  metalsmith.use(
+    collections({
+      gallery: 'photos/**/*.{jpg,png}',
+      news: {
+        metadata: {
+          title: 'Latest news',
+          description: 'All the latest in politics & world news'
+          slug: 'news'
+        },
+        pattern: 'news/**/*.html',
+        sortBy: 'pubdate',
+        reverse: true,
+      },
+      services: 'services/**/*.html'
+    })
+  )
+  ```
+
+  
+
+- **by file metadata** - add a `collection` property to the front-matter of each file that you want to add to a collection. The markdown file below will be included in the `news` collection even if it's not in the `news` folder (see previous example)
+
+  `something-happened.md`
+
+  ```md
+  ---
+  title: Something happened
+  collection: news
+  pubdate: 2021-12-01
+  layout: news.hbs
+  ---
+  ...contents
+  ```
+
+  Note that you can also add the same file to multiple collections, which is useful for example if you want to use `@metalsmith/collections` as a *category* system:
+
+  `something-happened.md`
+
+  ```md
+  title: Something happened
+  collection:
+    - news
+    - category_politics
+    - category_world
+  pubdate: 2021-12-01
+  layout: news.hbs
+  ---
+  ...contents
+  ```
+
+### Rendering collection items
+
+Here is an example of using [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-handlebars](https://github.com/jstransformers/jstransformer-handlebars) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
+
+`layouts/news.njk`
+
+```handlebars
+<h1>{{ title }}</h1> {{!-- something-happened.md title --}}
+<a href="/{{ collections.news.slug }}">Back to news</a> {{!-- news collection metadata.slug --}}
+{{ contents | safe }}
+<hr>
+{{!-- previous & next are added by @metalsmith/collections --}}
+{{#if previous}}
+Read the previous news:
+<a href="/{{ previous.path }}">{{ previous.title }}</a>
+{{/if}}
+{{#if next}}
+Read the next news:
+<a href="/{{ next.path }}">{{ next.title }}</a>
+{{/if}}
 ```
 
-But you can also match based on a `collection` property in each file's metadata by omitting a pattern, and adding the property to your files:
+*Note: If you don't need the `next` and `previous` references, you can pass the option `refer: false`*
 
-```js
-metalsmith.use(
-  collections({
-    articles: {
-      sortBy: 'date',
-      reverse: true
-    }
-  })
-)
+### Rendering collection index
+
+All matched files are added to an array that is exposed as a key of metalsmith global metadata, for example the `news` collection would be accessible at `Metalsmith.metadata().collections.news `. Below is an example of how you could render an index page for the `news` collection:
+
+`layouts/news-index.hbs`
+
+```handlebars
+<h1>{{ title }}</h1> {{!-- news collection metadata.title --}}
+<p>{{ description }}</p> {{!-- news collection metadata.description --}}
+<hr>
+{{!-- previous & next are added by @metalsmith/collections --}}
+{{#if collections.news.length }}
+  <ul>
+  {{#each collections.news}}
+    <li>
+      <h3><a href="/{{path}}">{{ title }}</a></h3>
+      <p>{{ excerpt }}</p>
+    </li>
+  {{/each}}
+  </ul>
+{{/each}}
+{{else}}
+No news at the moment...
+{{/if}}
 ```
 
-```markdown
----
-title: My Article
-collection: articles
-date: 2021-12-01
----
+### Custom sorting, filtering and limiting
 
-My article contents...
-```
-
-Multiple collections can also be assigned per file:
-
-```markdown
----
-title: My Article
-collection:
-  - articles
-  - news
-date: 2021-12-01
----
-
-My article contents...
-```
-
-All of the files with a matching `collection` will be added to an array that is exposed as a key of the same name on the global Metalsmith `metadata`.
-You can omit passing any options to the plugin when matching based on a `collection` property.
-
-Adds a `path` property to the collection item's data which contains the file path of the generated file. For example, this can be used in mustache templates to create links:
-
-```html
-<h1><a href="/{{ path }}">{{ title }}</a></h1>
-```
-
-The sorting method can be overridden with a custom function in order to sort the files in any order you prefer. For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
+You could define an `order` property on a set of files and pass `sortBy: "order"` to `@metalsmith/collections` for example, or you could override the sort with a custom function (for example to do multi-level sorting). For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
 
 ```js
 metalsmith.use(
@@ -136,29 +215,57 @@ metalsmith.use(
   })
 )
 ```
+*Note: the `sortBy` option also understands nested keypaths, e.g. `display.order`*
 
-The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added.
+The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added. The filterBy function below could work for a collection named `thisYearsNews` as it would filter out all the  items that are older than this year:
 
-### Collection Metadata
+```js
+function filterBy(file) {
+  const today = new Date()
+  const pubdate = new Date(file.pubdate)
+  return pubdate.getFullYear() === today.getFullYear()
+}
+```
 
-Additional metadata can be added to the collection object.
+Add a `limit` option to a collection config, for example to separate recent articles from archives:
 
 ```js
 metalsmith.use(
   collections({
-    articles: {
+    recentArticles: {
+      pattern: 'articles/**/*.html',
       sortBy: 'date',
-      reverse: true,
+      limit: 10
+    },
+    archives: {
+      pattern: 'archives/**/*.html',
+      sortBy: 'date',
+    }
+  })
+)
+```
+
+*Note: the collection is first sorted, reversed, filtered, and then limited, if applicable.*
+
+### Collection Metadata
+
+Additional metadata can be added to the collection object:
+
+```js
+metalsmith.use(
+  collections({
+    news: {
       metadata: {
-        name: 'Articles',
-        description: 'The Articles listed here...'
+        title: 'Latest news',
+        description: 'All the latest in politics & world news'
+        slug: 'news'
       }
     }
   })
 )
 ```
 
-Collection metadata can also be assigned from a `json` or `yaml` file.
+Collection metadata can be loaded from a `json` or `yaml` file (path relative to `Metalsmith.directory()`):
 
 ```js
 metalsmith.use(
@@ -167,33 +274,6 @@ metalsmith.use(
       sortBy: 'date',
       reverse: true,
       metadata: 'path/to/file.json'
-    }
-  })
-)
-```
-
-On each collection definition, it's possible to add a `limit` option so that the
-collection length is not higher than the given limit:
-
-```js
-metalsmith.use(
-  collections({
-    lastArticles: {
-      sortBy: 'date',
-      limit: 10
-    }
-  })
-)
-```
-
-By adding `refer: false` to your options, it will skip adding the "next" and
-"previous" links to your articles.
-
-```js
-metalsmith.use(
-  collections({
-    articles: {
-      refer: false
     }
   })
 )
