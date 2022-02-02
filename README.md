@@ -98,7 +98,7 @@ There are 2 ways to create collections & they can be used together:
         },
         pattern: 'news/**/*.html',
         sortBy: 'pubdate',
-        reverse: true,
+        reverse: true
       },
       services: 'services/**/*.html'
     })

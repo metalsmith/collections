@@ -388,4 +388,22 @@ describe('@metalsmith/collections', function () {
         done()
       })
   })
+
+  it('should not add duplicates on repeat builds', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/noconfig').use(collections())
+
+    new Promise((resolve, reject) => {
+      metalsmith.process((err) => {
+        if (err) reject(err)
+        resolve(metalsmith.metadata().collections)
+      })
+    })
+    .then(first => {
+      metalsmith.process((err) => {
+        if (err) done(err)
+        assert.deepStrictEqual(first, metalsmith.metadata().collections)
+        done()
+      })
+    })
+  })
 })
