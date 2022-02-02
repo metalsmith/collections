@@ -343,6 +343,34 @@ describe('@metalsmith/collections', function () {
     })
   })
 
+  // collections explicitly defined in front-matter should take precedence
+  it('should add collection property', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/complex')
+    metalsmith
+      .use(
+        collections({
+          patternMatched: { pattern: '{onlyByPattern,merged}.md' },
+          patternMatched2: { pattern: '{onlyByPattern,merged,orderTest}.md' },
+          duplicateMatch: 'duplicateMatch.md',
+          eight: 'orderTest.md'
+        })
+      )
+      .build(function (err, files) {
+        if (err) return done(err)
+        // front-matter dynamically defined collections should respect order in front-matter
+        assert.deepEqual(files['dynamicallyDefined.md'].collection, ['dynamic2', 'dynamic1'])
+        // front-matter dynamically defined collections should respect order of collection definition
+        assert.deepEqual(files['onlyByPattern.md'].collection, ['patternMatched', 'patternMatched2'])
+        // pattern-matched collections should be added after front-matter collections
+        assert.deepEqual(files['merged.md'].collection, ['news', 'patternMatched', 'patternMatched2'])
+        // mixed pattern & front-matter collections should respect mixed order
+        assert.deepEqual(files['orderTest.md'].collection, ['fourth', 'fifth', 'patternMatched2', 'eight'])
+        // should not add a collection matched twice as duplicate
+        assert.deepEqual(files['duplicateMatch.md'].collection, ['duplicateMatch', 'news'])
+        done()
+      })
+  })
+
   it('should add file path', function (done) {
     const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith
@@ -397,8 +425,7 @@ describe('@metalsmith/collections', function () {
         if (err) reject(err)
         resolve(metalsmith.metadata().collections)
       })
-    })
-    .then(first => {
+    }).then((first) => {
       metalsmith.process((err) => {
         if (err) done(err)
         assert.deepStrictEqual(first, metalsmith.metadata().collections)

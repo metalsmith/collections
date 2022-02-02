@@ -1,0 +1,5 @@
+---
+collection: news
+---
+
+two
