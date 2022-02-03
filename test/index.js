@@ -225,6 +225,33 @@ describe('@metalsmith/collections', function () {
     })
   })
 
+  it('should logically map references with other options', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/references-pointers')
+
+    new Promise((resolve) => {
+      metalsmith
+        .use(collections({ articles: { sortBy: 'date', reverse: true } }))
+        .process(function (err, files) {
+          if (err) return done(err)
+          const articles = metalsmith.metadata().articles
+          assert.deepStrictEqual(articles.map(a => a.date), [new Date('2022-01-03'),new Date('2022-01-02'),new Date('2022-01-01')])
+          assert.deepStrictEqual(articles.map(a => a.previous && a.previous.date), [new Date('2022-01-02'),new Date('2022-01-01'),null])
+          resolve()
+        })
+      })
+    .then(() => {
+      metalsmith
+        .use(collections({ articles: { sortBy: 'title', reverse: true, limit: 2 } }))
+        .process(function (err, files) {
+          if (err) return done(err)
+          const articles = metalsmith.metadata().articles
+          assert.deepStrictEqual(articles.map(a => a.title), [3, 2])
+          assert.deepStrictEqual(articles.map(a => a.previous && a.previous.title), [2, null])
+          done()
+        })
+    })
+  })
+
   it('should not fail with empty collections', function (done) {
     const metalsmith = Metalsmith('test/fixtures/empty')
     metalsmith
@@ -419,6 +446,9 @@ describe('@metalsmith/collections', function () {
 
   it('should not add duplicates on repeat builds', function (done) {
     const metalsmith = Metalsmith('test/fixtures/noconfig').use(collections())
+    function remap(collections) {
+      return Object.values(collections).map(coll => coll.map(({ path, collection }) => ({path, collection}) ))
+    }
 
     new Promise((resolve, reject) => {
       metalsmith.process((err) => {
@@ -428,7 +458,7 @@ describe('@metalsmith/collections', function () {
     }).then((first) => {
       metalsmith.process((err) => {
         if (err) done(err)
-        assert.deepStrictEqual(first, metalsmith.metadata().collections)
+        assert.deepStrictEqual(remap(first), remap(metalsmith.metadata().collections))
         done()
       })
     })
