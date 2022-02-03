@@ -15,7 +15,7 @@
     "type": "git",
     "url": "https://github.com/metalsmith/collections.git"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "main": "lib/index.js",
   "dependencies": {
