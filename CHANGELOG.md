@@ -1,9 +1,11 @@
 ### Changelog
+
 #### [v1.2.1](https://github.com/metalsmith/collections/compare/v1.2.1...v1.2.0) / 2022-02-03
 
 - Fixes [`#99`](https://github.com/metalsmith/collections/issues/99): collection key on file metadata - no dupes, no nested arrays
 - Fixes regression: incorrect previous & next refs when reverse: true
 - Fixes typo's in README
+
 #### [v1.2.0](https://github.com/metalsmith/collections/compare/v1.2.0...v1.1.0) / 2022-01-29
 
 - Feature: sortBy now also understands nested metadata properties, e.g. `sortBy: 'meta.display.order'`

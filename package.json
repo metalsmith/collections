@@ -49,7 +49,9 @@
     "coverage": "nyc report --reporter=text-lcov > ./coverage.info",
     "coveralls": "npm run coverage && cat ./coverage.info | coveralls",
     "format": "prettier --write \"**/*.{yml,md,js,json}\"",
-    "lint": "eslint --cache --fix-dry-run \"**/*.js\"",
+    "format:check": "prettier --list-different \"**/*.{yml,md,js,json}\"",
+    "lint": "eslint --fix .",
+    "lint:check": "eslint --fix-dry-run .",
     "dev": "nodemon --exec 'npm test'",
     "release": "release-it ."
   },
