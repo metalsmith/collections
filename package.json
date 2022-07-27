@@ -20,7 +20,6 @@
   "main": "lib/index.js",
   "dependencies": {
     "lodash.get": "^4.4.2",
-    "multimatch": "^4.0.0",
     "read-metadata": "^1.0.0"
   },
   "devDependencies": {
@@ -29,7 +28,7 @@
     "debug": "^4.3.4",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
-    "metalsmith": "^2.3.0",
+    "metalsmith": "^2.4.1",
     "mocha": "^9.2.2",
     "nodemon": "^2.0.19",
     "nyc": "^15.1.0",
@@ -59,7 +58,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "metalsmith": "^2.3.0"
+    "metalsmith": "^2.4.1"
   },
   "engines": {
     "node": ">=12"
