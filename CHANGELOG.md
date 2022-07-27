@@ -1,5 +1,11 @@
 ### Changelog
 
+#### [v1.2.2](https://github.com/metalsmith/collections/compare/v1.2.2...v1.2.1) / 2022-07-28
+
+- Resolves [`#102`](https://github.com/metalsmith/collections/issues/99): removes multimatch dependency, uses metalsmith.match instead
+- Drops support for Metalsmith < 2.4.1
+- Drops support for Node < 12
+
 #### [v1.2.1](https://github.com/metalsmith/collections/compare/v1.2.1...v1.2.0) / 2022-02-03
 
 - Fixes [`#99`](https://github.com/metalsmith/collections/issues/99): collection key on file metadata - no dupes, no nested arrays
