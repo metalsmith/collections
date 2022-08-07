@@ -17,7 +17,14 @@
   },
   "version": "1.2.2",
   "license": "MIT",
-  "main": "lib/index.js",
+  "source": "src/index.js",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "type": "module",
+  "exports": {
+    "import": "./lib/index.js",
+    "require": "./lib/index.cjs"
+  },
   "dependencies": {
     "lodash.get": "^4.4.2",
     "read-metadata": "^1.0.0"
@@ -27,7 +34,10 @@
     "coveralls": "^3.1.1",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
     "metalsmith": "^2.5.0",
+    "microbundle": "^0.15.0",
     "mocha": "^9.2.2",
     "nodemon": "^2.0.19",
     "nyc": "^15.1.0",
@@ -43,15 +53,16 @@
   ],
   "scripts": {
     "changelog": "auto-changelog -u --starting-date 2021-12-01 --sort-commits date-desc --commit-limit false --ignore-commit-pattern '(dev|Release|Merge)'",
-    "test": "nyc mocha",
     "coverage": "nyc report --reporter=text-lcov > ./coverage.info",
-    "coveralls": "npm run coverage && cat ./coverage.info | coveralls",
     "format": "prettier --write \"**/*.{yml,md,js,json}\"",
     "format:check": "prettier --list-different \"**/*.{yml,md,js,json}\"",
     "lint": "eslint --fix .",
     "lint:check": "eslint --fix-dry-run .",
     "dev": "nodemon --exec 'npm test'",
-    "release": "release-it ."
+    "release": "release-it .",
+    "build": "microbundle --target node --no-sourcemap -f cjs,esm",
+    "pretest": "npm run build",
+    "test": "nyc mocha"
   },
   "publishConfig": {
     "access": "public"

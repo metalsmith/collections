@@ -1,6 +1,8 @@
 const assert = require('assert')
 const { it, describe } = require('mocha')
 const Metalsmith = require('metalsmith')
+
+/* eslint-disable-next-line node/no-missing-require */
 const collections = require('..')
 const { name } = require('../package.json')
 
@@ -113,7 +115,14 @@ describe('@metalsmith/collections', function () {
   })
 
   it('should accept a "sortBy" function', function (done) {
+    function sort(a, b) {
+      a = a.title.slice(1)
+      b = b.title.slice(1)
+      return a > b ? 1 : -1
+    }
+
     const metalsmith = Metalsmith('test/fixtures/sort')
+
     metalsmith.use(collections({ articles: { sortBy: sort } })).build(function (err) {
       if (err) return done(err)
       const articles = metalsmith.metadata().articles
@@ -122,12 +131,6 @@ describe('@metalsmith/collections', function () {
       assert.strictEqual('Alpha', articles[2].title)
       done()
     })
-
-    function sort(a, b) {
-      a = a.title.slice(1)
-      b = b.title.slice(1)
-      return a > b ? 1 : -1
-    }
   })
 
   it('should accept a "reverse" option', function (done) {

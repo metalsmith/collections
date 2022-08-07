@@ -1,5 +1,30 @@
+<<<<<<< HEAD:lib/index.js
 const loadMetadata = require('read-metadata').sync
 const get = require('lodash.get')
+=======
+import createDebug from 'debug'
+import get from 'lodash.get'
+import { sync as loadMetadata } from 'read-metadata'
+
+function sortBy(key) {
+  let getKey = (x) => x[key]
+  if (key.includes('.')) {
+    getKey = (x) => get(x, key)
+  }
+  return function defaultSort(a, b) {
+    a = getKey(a)
+    b = getKey(b)
+    if (!a && !b) return 0
+    if (!a) return -1
+    if (!b) return 1
+    if (b > a) return -1
+    if (a > b) return 1
+    return 0
+  }
+}
+
+const debug = createDebug('@metalsmith/collections')
+>>>>>>> f4d20a6... Provides dual ESM/CJS bundle:src/index.js
 // for backwards-compatibility only, date makes as little sense as "pubdate" or any custom key
 const defaultSort = sortBy('date')
 const defaultFilter = () => true
@@ -24,23 +49,6 @@ const defaultOptions = {
   refer: true,
   sortBy: defaultSort,
   filterBy: defaultFilter
-}
-
-function sortBy(key) {
-  let getKey = (x) => x[key]
-  if (key.includes('.')) {
-    getKey = (x) => get(x, key)
-  }
-  return function defaultSort(a, b) {
-    a = getKey(a)
-    b = getKey(b)
-    if (!a && !b) return 0
-    if (!a) return -1
-    if (!b) return 1
-    if (b > a) return -1
-    if (a > b) return 1
-    return 0
-  }
 }
 
 /**
@@ -191,4 +199,4 @@ function initializeCollections(options) {
 
 initializeCollections.defaults = defaultOptions
 
-module.exports = initializeCollections
+export default initializeCollections

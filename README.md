@@ -36,9 +36,12 @@ yarn add @metalsmith/collections
 Pass options to `@metalsmith/collections` in the plugin chain:
 
 ```js
-const Metalsmith = require('metalsmith')
-const markdown = require('@metalsmith/markdown')
-const collections = require('@metalsmith/collections')
+import Metalsmith from 'metalsmith'
+import markdown from '@metalsmith/markdown'
+import collections from '@metalsmith/collections'
+import { dirname } from 'path'
+
+const __dirname = dirname(new URL(import.meta.url).pathname)
 
 // defaults, only create collections based on file metadata
 Metalsmith(__dirname)
