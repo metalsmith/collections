@@ -77,8 +77,16 @@ function normalizeOptions(options) {
 }
 
 /**
- * Metalsmith plugin that adds `collections` of files to the global
- * metadata as a sorted array.
+ * Add `collections` of files to the global metadata as a sorted array.
+ * @example
+ * metalsmith.use(collections({
+ *   posts: 'posts/*.md',
+ *   portfolio: {
+ *     pattern: 'portfolio/*.md',
+ *     metadata: { title: 'My portfolio' },
+ *     sortBy: 'order'
+ *   }
+ * }))
  *
  * @param {Object.<string,CollectionConfig|string>} options
  * @return {import('metalsmith').Plugin}

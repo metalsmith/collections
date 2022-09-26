@@ -1,5 +1,5 @@
+/* eslint-env node, mocha */
 const assert = require('assert')
-const { it, describe } = require('mocha')
 const Metalsmith = require('metalsmith')
 
 /* eslint-disable-next-line node/no-missing-require */
