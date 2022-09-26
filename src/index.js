@@ -1,8 +1,3 @@
-<<<<<<< HEAD:lib/index.js
-const loadMetadata = require('read-metadata').sync
-const get = require('lodash.get')
-=======
-import createDebug from 'debug'
 import get from 'lodash.get'
 import { sync as loadMetadata } from 'read-metadata'
 
@@ -23,8 +18,6 @@ function sortBy(key) {
   }
 }
 
-const debug = createDebug('@metalsmith/collections')
->>>>>>> f4d20a6... Provides dual ESM/CJS bundle:src/index.js
 // for backwards-compatibility only, date makes as little sense as "pubdate" or any custom key
 const defaultSort = sortBy('date')
 const defaultFilter = () => true
