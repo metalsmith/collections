@@ -1,4 +1,4 @@
-name: CI
+name: Gitter notification
 on: create
 
 jobs:
