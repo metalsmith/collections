@@ -1,5 +1,11 @@
 ### Changelog
 
+#### [v1.3.0](https://github.com/metalsmith/collections/compare/v1.3.0...v1.2.2) / 2022-09-27
+
+- Provides dual ESM/CJS bundle [`61430d4`](https://github.com/metalsmith/collections/commit/61430d4)
+- Adds Typescript types support [`9f9b36c`](https://github.com/metalsmith/collections/commit/9f9b36c)
+- Replaced debug with `metalsmith.debug` [`8df9e65`](https://github.com/metalsmith/collections/commit/8df9e65) (by [@leviwheatcroft](https://github.com/leviwheatcroft))
+
 #### [v1.2.2](https://github.com/metalsmith/collections/compare/v1.2.2...v1.2.1) / 2022-07-28
 
 - Resolves [`#102`](https://github.com/metalsmith/collections/issues/99): removes multimatch dependency, uses metalsmith.match instead
