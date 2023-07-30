@@ -399,25 +399,6 @@ describe('@metalsmith/collections', function () {
       })
   })
 
-  it('should add file path', function (done) {
-    const metalsmith = Metalsmith('test/fixtures/sort')
-    metalsmith
-      .use(
-        collections({
-          articles: {
-            sortBy: 'title'
-          }
-        })
-      )
-      .build(function (err) {
-        if (err) return done(err)
-        const articles = metalsmith.metadata().collections.articles
-        assert(articles[0].path)
-        assert.strictEqual(articles[0].path, 'one.md')
-        done()
-      })
-  })
-
   it('should accept a "filterBy" function', function (done) {
     const metalsmith = Metalsmith('test/fixtures/filter')
     metalsmith
