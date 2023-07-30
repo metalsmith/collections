@@ -20,8 +20,8 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections()).build((err) => {
       const m = metalsmith.metadata()
       assert.strictEqual(err, null)
-      assert.strictEqual(2, m.books.length)
-      assert.strictEqual(1, m.movies.length)
+      assert.strictEqual(2, m.collections.books.length)
+      assert.strictEqual(1, m.collections.movies.length)
       done()
     })
   })
@@ -30,8 +30,8 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ articles: {} })).build(function (err) {
       if (err) return done(err)
       const m = metalsmith.metadata()
-      assert.strictEqual(2, m.articles.length)
-      assert.strictEqual(m.collections.articles, m.articles)
+      assert.strictEqual(2, m.collections.articles.length)
+      assert.strictEqual(m.collections.articles, m.collections.articles)
       done()
     })
   })
@@ -48,7 +48,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        assert.strictEqual(4, metalsmith.metadata().articles.length)
+        assert.strictEqual(4, metalsmith.metadata().collections.articles.length)
         done()
       })
   })
@@ -63,7 +63,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        assert.strictEqual(4, metalsmith.metadata().articles.length)
+        assert.strictEqual(4, metalsmith.metadata().collections.articles.length)
         done()
       })
   })
@@ -79,8 +79,8 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err, files) {
         if (err) return done(err)
-        assert.strictEqual(1, metalsmith.metadata().blogs.length, 'length blogs')
-        assert.strictEqual(1, metalsmith.metadata().pages.length, 'length page')
+        assert.strictEqual(1, metalsmith.metadata().collections.blogs.length, 'length blogs')
+        assert.strictEqual(1, metalsmith.metadata().collections.pages.length, 'length page')
         assert.deepStrictEqual(files['three.md'].collection, ['blogs'], 'collection blogs')
         assert.deepStrictEqual(files['four.md'].collection, ['pages'], 'collection page')
         done()
@@ -106,7 +106,7 @@ describe('@metalsmith/collections', function () {
     const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith.use(collections({ articles: { sortBy: 'title' } })).build(function (err) {
       if (err) return done(err)
-      const articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().collections.articles
       assert.strictEqual('Alpha', articles[0].title)
       assert.strictEqual('Beta', articles[1].title)
       assert.strictEqual('Gamma', articles[2].title)
@@ -125,7 +125,7 @@ describe('@metalsmith/collections', function () {
 
     metalsmith.use(collections({ articles: { sortBy: sort } })).build(function (err) {
       if (err) return done(err)
-      const articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().collections.articles
       assert.strictEqual('Gamma', articles[0].title)
       assert.strictEqual('Beta', articles[1].title)
       assert.strictEqual('Alpha', articles[2].title)
@@ -146,7 +146,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.strictEqual('Alpha', articles[2].title)
         assert.strictEqual('Beta', articles[1].title)
         assert.strictEqual('Gamma', articles[0].title)
@@ -168,7 +168,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(limit, articles.length)
         assert.strictEqual('Alpha', articles[0].title)
         assert.strictEqual('Beta', articles[1].title)
@@ -189,7 +189,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(3, articles.length)
         assert.strictEqual('Alpha', articles[0].title)
         assert.strictEqual('Beta', articles[1].title)
@@ -202,7 +202,7 @@ describe('@metalsmith/collections', function () {
     const metalsmith = Metalsmith('test/fixtures/references')
     metalsmith.use(collections({ articles: {} })).build(function (err) {
       if (err) return done(err)
-      const articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().collections.articles
       assert(!articles[0].previous)
       assert.strictEqual(articles[0].next, articles[1])
       assert.strictEqual(articles[1].previous, articles[0])
@@ -217,7 +217,7 @@ describe('@metalsmith/collections', function () {
     const metalsmith = Metalsmith('test/fixtures/references-off')
     metalsmith.use(collections({ articles: { refer: false } })).build(function (err) {
       if (err) return done(err)
-      const articles = metalsmith.metadata().articles
+      const articles = metalsmith.metadata().collections.articles
       assert(!articles[0].previous)
       assert(!articles[0].next)
       assert(!articles[1].previous)
@@ -234,7 +234,7 @@ describe('@metalsmith/collections', function () {
     new Promise((resolve) => {
       metalsmith.use(collections({ articles: { sortBy: 'date', reverse: true } })).process(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.deepStrictEqual(
           articles.map((a) => a.date),
           [new Date('2022-01-03'), new Date('2022-01-02'), new Date('2022-01-01')]
@@ -248,7 +248,7 @@ describe('@metalsmith/collections', function () {
     }).then(() => {
       metalsmith.use(collections({ articles: { sortBy: 'title', reverse: true, limit: 2 } })).process(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.deepStrictEqual(
           articles.map((a) => a.title),
           [3, 2]
@@ -275,7 +275,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(articles.length, 0)
         done()
       })
@@ -294,7 +294,7 @@ describe('@metalsmith/collections', function () {
       .build(function (err) {
         if (err) return done(err)
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.articles.metadata.name)
+        assert.strictEqual('Batman', m.collections.articles.metadata.name)
         done()
       })
   })
@@ -312,7 +312,7 @@ describe('@metalsmith/collections', function () {
       .build(function (err) {
         if (err) return done(err)
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.articles.metadata.name)
+        assert.strictEqual('Batman', m.collections.articles.metadata.name)
         done()
       })
   })
@@ -330,7 +330,7 @@ describe('@metalsmith/collections', function () {
       .build(function (err) {
         if (err) return done(err)
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.articles.metadata.name)
+        assert.strictEqual('Batman', m.collections.articles.metadata.name)
         done()
       })
   })
@@ -340,12 +340,9 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ articles: {}, posts: {}, drafts: {} })).build(function (err) {
       if (err) return done(err)
       const m = metalsmith.metadata()
-      assert.strictEqual(2, m.articles.length)
-      assert.strictEqual(1, m.drafts.length)
-      assert.strictEqual(1, m.posts.length)
-      assert.strictEqual(m.collections.articles, m.articles)
-      assert.strictEqual(m.collections.drafts, m.drafts)
-      assert.strictEqual(m.collections.posts, m.posts)
+      assert.strictEqual(2, m.collections.articles.length)
+      assert.strictEqual(1, m.collections.drafts.length)
+      assert.strictEqual(1, m.collections.posts.length)
       done()
     })
   })
@@ -355,10 +352,8 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ movies: {} })).build(function (err) {
       if (err) return done(err)
       const m = metalsmith.metadata()
-      assert.strictEqual(2, m.books.length)
-      assert.strictEqual(1, m.movies.length)
-      assert.strictEqual(m.collections.books, m.books)
-      assert.strictEqual(m.collections.movies, m.movies)
+      assert.strictEqual(2, m.collections.books.length)
+      assert.strictEqual(1, m.collections.movies.length)
       done()
     })
   })
@@ -368,14 +363,10 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ articles: {}, posts: {}, drafts: {}, blog: '*.md' })).build(function (err) {
       if (err) return done(err)
       const m = metalsmith.metadata()
-      assert.strictEqual(3, m.blog.length)
-      assert.strictEqual(2, m.articles.length)
-      assert.strictEqual(1, m.drafts.length)
-      assert.strictEqual(1, m.posts.length)
-      assert.strictEqual(m.collections.blog, m.blog)
-      assert.strictEqual(m.collections.articles, m.articles)
-      assert.strictEqual(m.collections.drafts, m.drafts)
-      assert.strictEqual(m.collections.posts, m.posts)
+      assert.strictEqual(3, m.collections.blog.length)
+      assert.strictEqual(2, m.collections.articles.length)
+      assert.strictEqual(1, m.collections.drafts.length)
+      assert.strictEqual(1, m.collections.posts.length)
       done()
     })
   })
@@ -420,7 +411,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert(articles[0].path)
         assert.strictEqual(articles[0].path, 'one.md')
         done()
@@ -445,7 +436,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err) {
         if (err) return done(err)
-        const articles = metalsmith.metadata().articles
+        const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(1, articles.length)
         const articleDate = new Date(articles[0].date)
         assert.strictEqual(true, articleDate instanceof Date)

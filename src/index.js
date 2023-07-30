@@ -162,37 +162,36 @@ function collections(options) {
         debug('Warning: overwriting previously set metadata property %s', name)
       }
       // apply sort, reverse, filter, limit options in this order
-      metadata[name] = matches.sort(sortBy)
+      let currentCollection = (metadata.collections[name] = matches.sort(sortBy))
 
       if (reverse) {
-        metadata[name].reverse()
+        currentCollection.reverse()
       }
 
-      metadata[name] = metadata[name].filter(filterBy).slice(0, limit)
+      currentCollection = metadata.collections[name] = currentCollection.filter(filterBy).slice(0, limit)
 
       if (collection.metadata) {
-        metadata[name].metadata = collection.metadata
+        currentCollection.metadata = collection.metadata
       }
       if (refer) {
         if (reverse) {
-          metadata[name].forEach((file, i) => {
+          currentCollection.forEach((file, i) => {
             Object.assign(file, {
-              next: i > 0 ? metadata[name][i - 1] : null,
-              previous: i < metadata[name].length - 1 ? metadata[name][i + 1] : null
+              next: i > 0 ? currentCollection[i - 1] : null,
+              previous: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
             })
           })
         } else {
-          metadata[name].forEach((file, i) => {
+          currentCollection.forEach((file, i) => {
             Object.assign(file, {
-              previous: i > 0 ? metadata[name][i - 1] : null,
-              next: i < metadata[name].length - 1 ? metadata[name][i + 1] : null
+              previous: i > 0 ? currentCollection[i - 1] : null,
+              next: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
             })
           })
         }
       }
 
-      metadata.collections[name] = metadata[name]
-      debug('Added %s files to collection %s', metadata[name].length, name)
+      debug('Added %s files to collection %s', currentCollection.length, name)
     })
     done()
   }
