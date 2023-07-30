@@ -1,0 +1,5 @@
+---
+title: two
+collection:
+  - first
+---
