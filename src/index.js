@@ -92,17 +92,14 @@ function collections(options) {
   })
 
   return function collections(files, metalsmith, done) {
-    const metadata = metalsmith.metadata()
     const fileNames = Object.keys(files)
     const debug = metalsmith.debug('@metalsmith/collections')
 
-    metadata.collections = {}
+    metalsmith.metadata({ collections: {} })
+    const metadata = metalsmith.metadata()
 
     fileNames.forEach((filePath) => {
-      // add path property to file metadata for convenience
-      // this is for backward-compatibility only and is pretty useless
       const file = files[filePath]
-      file.path = file.path || filePath
 
       // dynamically add collections with default options when encountered in file metadata,
       // and not explicitly defined in plugin options
