@@ -1,5 +1,5 @@
 import get from 'lodash.get'
-import { sync as loadMetadata } from 'read-metadata'
+import { relative, resolve } from 'path'
 
 function sortBy(key) {
   let getKey = (x) => x[key]
@@ -47,9 +47,13 @@ const defaultOptions = {
 /**
  * Normalize options
  * @param {Object.<string,CollectionConfig>} options
+ * @param {import('metalsmith').Files} files
+ * @param {import('metalsmith')} metalsmith
+ * @throws {}
  */
-function normalizeOptions(options) {
+function normalizeOptions(options, files, metalsmith) {
   options = options || {}
+  const matter = metalsmith.matter
 
   for (const config in options) {
     let normalized = options[config]
@@ -58,7 +62,15 @@ function normalizeOptions(options) {
     }
     normalized = Object.assign({}, defaultOptions, normalized)
     if (typeof normalized.metadata === 'string') {
-      normalized.metadata = loadMetadata(normalized.metadata)
+      const absPath = resolve(metalsmith.source(), normalized.metadata)
+      const inSourcePath = relative(metalsmith.source(), absPath)
+      const metadataFile = files[inSourcePath]
+      if (!metadataFile) {
+        const err = new Error(`No collection metadata file at "${absPath}"`)
+        err.name = '@metalsmith/collections'
+        throw err
+      }
+      normalized.metadata = matter.parse(matter.wrap(metadataFile.contents.toString()))
     }
     if (typeof normalized.sortBy === 'string') {
       normalized.sortBy = sortBy(normalized.sortBy)
@@ -85,13 +97,17 @@ function normalizeOptions(options) {
  * @return {import('metalsmith').Plugin}
  */
 function collections(options) {
-  options = normalizeOptions(options)
-  const collectionNames = Object.keys(options)
-  const mappedCollections = collectionNames.map((name) => {
-    return Object.assign({ name: name }, options[name])
-  })
-
   return function collections(files, metalsmith, done) {
+    try {
+      options = normalizeOptions(options, files, metalsmith)
+    } catch (err) {
+      done(err)
+    }
+    const collectionNames = Object.keys(options)
+    const mappedCollections = collectionNames.map((name) => {
+      return Object.assign({ name: name }, options[name])
+    })
+
     const fileNames = Object.keys(files)
     const debug = metalsmith.debug('@metalsmith/collections')
 
