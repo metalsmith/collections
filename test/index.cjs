@@ -300,12 +300,12 @@ describe('@metalsmith/collections', function () {
   })
 
   it('should load collection metadata from a JSON file', function (done) {
-    const metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/metadata')
     metalsmith
       .use(
         collections({
           articles: {
-            metadata: 'test/fixtures/metadata/metadata.json'
+            metadata: 'metadata.json'
           }
         })
       )
@@ -318,12 +318,12 @@ describe('@metalsmith/collections', function () {
   })
 
   it('should load collection metadata from a YAML file', function (done) {
-    const metalsmith = Metalsmith('test/fixtures/basic')
+    const metalsmith = Metalsmith('test/fixtures/metadata')
     metalsmith
       .use(
         collections({
           articles: {
-            metadata: 'test/fixtures/metadata/metadata.yaml'
+            metadata: 'metadata.yaml'
           }
         })
       )
@@ -332,6 +332,50 @@ describe('@metalsmith/collections', function () {
         const m = metalsmith.metadata()
         assert.strictEqual('Batman', m.collections.articles.metadata.name)
         done()
+      })
+  })
+
+  it('should error when loading collection metadata from a file not found', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/metadata')
+    const expectedMsg = 'No collection metadata file at'
+    metalsmith
+      .use(
+        collections({
+          articles: {
+            metadata: 'not_there_metadata.yaml'
+          }
+        })
+      )
+      .build(function (err) {
+        try {
+          assert(err instanceof Error)
+          assert.strictEqual(err.message.slice(0, expectedMsg.length), expectedMsg)
+          done()
+        } catch (err) {
+          done(err)
+        }
+      })
+  })
+
+  it('should error when loading collection metadata from an invalid file', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/metadata')
+    const expectedMsg = 'end of the stream or a document separator is expected'
+    metalsmith
+      .use(
+        collections({
+          articles: {
+            metadata: 'invalid_metadata.json'
+          }
+        })
+      )
+      .build(function (err) {
+        try {
+          assert(err instanceof Error)
+          assert.strictEqual(err.message.slice(0, expectedMsg.length), expectedMsg)
+          done()
+        } catch (err) {
+          done(err)
+        }
       })
   })
 
