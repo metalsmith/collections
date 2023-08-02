@@ -192,10 +192,13 @@ function collections(options) {
         currentCollection.metadata = collection.metadata
       }
       if (refer) {
+        const lastIndex = currentCollection.length - 1
         currentCollection.forEach((file, i) => {
           Object.assign(file, {
             previous: i > 0 ? currentCollection[i - 1] : null,
-            next: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
+            next: i < lastIndex ? currentCollection[i + 1] : null,
+            first: currentCollection[0],
+            last: currentCollection[lastIndex]
           })
         })
       }

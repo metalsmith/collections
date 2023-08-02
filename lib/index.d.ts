@@ -19,7 +19,7 @@ export type CollectionConfig = {
      */
     limit?: number;
     /**
-     * - Adds `next` and `previous` keys to file metadata of matched files
+     * - Adds `next`, `previous`, `first` and `last` keys to file metadata of matched files
      */
     refer?: boolean;
     /**

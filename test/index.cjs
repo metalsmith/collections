@@ -195,7 +195,7 @@ describe('@metalsmith/collections', function () {
       })
   })
 
-  it('should add next and previous references', function (done) {
+  it('should add next, previous, first and last references', function (done) {
     const metalsmith = Metalsmith('test/fixtures/references')
     metalsmith.use(collections({ articles: {} })).build(function (err) {
       if (err) return done(err)
@@ -205,6 +205,8 @@ describe('@metalsmith/collections', function () {
       assert.strictEqual(articles[1].previous, articles[0])
       assert.strictEqual(articles[1].next, articles[2])
       assert.strictEqual(articles[2].previous, articles[1])
+      assert.strictEqual(articles.some(a => a.last !== articles[2]), false)
+      assert.strictEqual(articles.some(a => a.first !== articles[0]), false)
       assert(!articles[2].next)
       done()
     })
