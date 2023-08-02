@@ -1,7 +1,8 @@
 import get from 'lodash.get'
 import { relative, resolve } from 'path'
 
-function sortBy(key) {
+function sortBy(key, order) {
+  order = order === 'asc' ? -1 : 1
   let getKey = (x) => x[key]
   if (key.includes('.')) {
     getKey = (x) => get(x, key)
@@ -9,39 +10,40 @@ function sortBy(key) {
   return function defaultSort(a, b) {
     a = getKey(a)
     b = getKey(b)
-    if (!a && !b) return 0
-    if (!a) return -1
-    if (!b) return 1
-    if (b > a) return -1
-    if (a > b) return 1
-    return 0
+    let ret
+    if (!a && !b) ret = 0
+    else if (!a) ret = 1 * order
+    else if (!b) ret = -1 * order
+    else if (b > a) ret = 1 * order
+    else if (a > b) ret = -1 * order
+    else ret = 0
+
+    return ret
   }
 }
 
 // for backwards-compatibility only, date makes as little sense as "pubdate" or any custom key
-const defaultSort = sortBy('date')
+const defaultSort = sortBy('date', 'desc')
 const defaultFilter = () => true
 
 /**
  * @typedef {Object} CollectionConfig
  * @property {string|string[]} [pattern] - One or more glob patterns to match files to a collection
- * @property {string|(a,b) => 0|1|-1} [sortBy] - A key to sort by (e.g. `date`,`title`, ..) or a custom sort function
+ * @property {string|(a,b) => 0|1|-1} [sort] - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, or a custom sort function
  * @property {number} [limit] - Limit the amount of items in a collection to `limit`
  * @property {boolean} [refer] - Adds `next` and `previous` keys to file metadata of matched files
- * @property {boolean} [reverse] - Whether to invert the sorting function results (asc/descending)
- * @property {Function} [filterBy] - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
+ * @property {Function} [filter] - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
  * @property {Object|string} [metadata] - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
  */
 
 /** @type {CollectionConfig} */
 const defaultOptions = {
   pattern: null,
-  reverse: false,
   metadata: null,
   limit: Infinity,
   refer: true,
-  sortBy: defaultSort,
-  filterBy: defaultFilter
+  sort: defaultSort,
+  filter: defaultFilter
 }
 
 /**
@@ -72,9 +74,16 @@ function normalizeOptions(options, files, metalsmith) {
       }
       normalized.metadata = matter.parse(matter.wrap(metadataFile.contents.toString()))
     }
-    if (typeof normalized.sortBy === 'string') {
-      normalized.sortBy = sortBy(normalized.sortBy)
+
+    // remap sort option
+    let sort = normalized.sort
+    if (typeof sort === 'string') {
+      if (!sort.includes(':')) sort += ':desc'
+      const [key, order] = sort.split(':')
+      sort = sortBy(key, order)
     }
+    normalized.sort = sort
+
     options[config] = normalized
   }
 
@@ -89,7 +98,7 @@ function normalizeOptions(options, files, metalsmith) {
  *   portfolio: {
  *     pattern: 'portfolio/*.md',
  *     metadata: { title: 'My portfolio' },
- *     sortBy: 'order'
+ *     sort: 'date:desc'
  *   }
  * }))
  *
@@ -133,7 +142,7 @@ function collections(options) {
     debug('Identified %s collections: %s', mappedCollections.length, collectionNames.join())
 
     mappedCollections.forEach((collection) => {
-      const { pattern, filterBy, sortBy, reverse, refer, limit } = collection
+      const { pattern, filter, sort, refer, limit } = collection
       const name = collection.name
       const matches = []
       debug('Processing collection %s with options %s:', name, collection)
@@ -174,34 +183,21 @@ function collections(options) {
       if (Object.prototype.hasOwnProperty.call(metadata, name)) {
         debug('Warning: overwriting previously set metadata property %s', name)
       }
-      // apply sort, reverse, filter, limit options in this order
-      let currentCollection = (metadata.collections[name] = matches.sort(sortBy))
+      // apply sort, filter, limit options in this order
+      let currentCollection = (metadata.collections[name] = matches.sort(sort))
 
-      if (reverse) {
-        currentCollection.reverse()
-      }
-
-      currentCollection = metadata.collections[name] = currentCollection.filter(filterBy).slice(0, limit)
+      currentCollection = metadata.collections[name] = currentCollection.filter(filter).slice(0, limit)
 
       if (collection.metadata) {
         currentCollection.metadata = collection.metadata
       }
       if (refer) {
-        if (reverse) {
-          currentCollection.forEach((file, i) => {
-            Object.assign(file, {
-              next: i > 0 ? currentCollection[i - 1] : null,
-              previous: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
-            })
+        currentCollection.forEach((file, i) => {
+          Object.assign(file, {
+            previous: i > 0 ? currentCollection[i - 1] : null,
+            next: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
           })
-        } else {
-          currentCollection.forEach((file, i) => {
-            Object.assign(file, {
-              previous: i > 0 ? currentCollection[i - 1] : null,
-              next: i < currentCollection.length - 1 ? currentCollection[i + 1] : null
-            })
-          })
-        }
+        })
       }
 
       debug('Added %s files to collection %s', currentCollection.length, name)

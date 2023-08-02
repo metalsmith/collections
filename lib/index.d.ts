@@ -7,9 +7,13 @@ export type CollectionConfig = {
      */
     pattern?: string | string[] | null;
     /**
-     * - A key to sort by (e.g. `date`,`title`, ..) or a custom sort function
+     * - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, or a custom sort function
+     * @example
+     * 'date'
+     * 'pubdate:desc'
+     * 'order:asc'
      */
-    sortBy?: string | ((a: any, b: any) => 0 | 1 | -1);
+    sort?: string | ((a: any, b: any) => 0 | 1 | -1);
     /**
      * - Limit the amount of items in a collection to `limit`
      */
@@ -19,13 +23,9 @@ export type CollectionConfig = {
      */
     refer?: boolean;
     /**
-     * - Whether to invert the sorting function results (asc/descending)
-     */
-    reverse?: boolean;
-    /**
      * - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
      */
-    filterBy?: Function;
+    filter?: Function;
     /**
      * - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
      */
@@ -39,7 +39,7 @@ export type CollectionConfig = {
  *   portfolio: {
  *     pattern: 'portfolio/*.md',
  *     metadata: { title: 'My portfolio' },
- *     sortBy: 'order'
+ *     sort: 'order:asc'
  *   }
  * }))
  *

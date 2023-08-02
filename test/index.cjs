@@ -102,19 +102,21 @@ describe('@metalsmith/collections', function () {
       })
   })
 
-  it('should accept a "sortBy" option', function (done) {
+  it('should accept a "sort" option', function (done) {
     const metalsmith = Metalsmith('test/fixtures/sort')
-    metalsmith.use(collections({ articles: { sortBy: 'title' } })).build(function (err) {
-      if (err) return done(err)
-      const articles = metalsmith.metadata().collections.articles
-      assert.strictEqual('Alpha', articles[0].title)
-      assert.strictEqual('Beta', articles[1].title)
-      assert.strictEqual('Gamma', articles[2].title)
-      done()
+    metalsmith.use(collections({ articles: { sort: 'title' } })).build(function (err) {
+        try {
+          assert(!(err instanceof Error))
+          const articles = metalsmith.metadata().collections.articles
+          assert.deepStrictEqual(articles.map(a => a.title), ['Gamma', 'Beta', 'Alpha'])
+          done()
+        } catch (err) {
+          done(err)
+        }
     })
   })
 
-  it('should accept a "sortBy" function', function (done) {
+  it('should accept a "sort" function', function (done) {
     function sort(a, b) {
       a = a.title.slice(1)
       b = b.title.slice(1)
@@ -123,7 +125,7 @@ describe('@metalsmith/collections', function () {
 
     const metalsmith = Metalsmith('test/fixtures/sort')
 
-    metalsmith.use(collections({ articles: { sortBy: sort } })).build(function (err) {
+    metalsmith.use(collections({ articles: { sort } })).build(function (err) {
       if (err) return done(err)
       const articles = metalsmith.metadata().collections.articles
       assert.strictEqual('Gamma', articles[0].title)
@@ -133,68 +135,63 @@ describe('@metalsmith/collections', function () {
     })
   })
 
-  it('should accept a "reverse" option', function (done) {
+  it('should accept an asc sort order', function (done) {
     const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith
       .use(
         collections({
           articles: {
-            sortBy: 'title',
-            reverse: true
+            sort: 'title:asc'
           }
         })
       )
       .build(function (err) {
-        if (err) return done(err)
-        const articles = metalsmith.metadata().collections.articles
-        assert.strictEqual('Alpha', articles[2].title)
-        assert.strictEqual('Beta', articles[1].title)
-        assert.strictEqual('Gamma', articles[0].title)
-        done()
+        try {
+          assert(!(err instanceof Error))
+          const articles = metalsmith.metadata().collections.articles
+          assert.deepStrictEqual(articles.map(a => a.title), ['Alpha', 'Beta', 'Gamma'])
+          done()
+        } catch (err) {
+          done(err)
+        }
       })
   })
 
-  it('should accept a "limit" option', function (done) {
+  it('should accept a "limit" option', function () {
     const metalsmith = Metalsmith('test/fixtures/limit'),
       limit = 2
-    metalsmith
+    return metalsmith
       .use(
         collections({
           articles: {
-            limit: limit,
-            sortBy: 'title'
+            limit,
+            sort: 'title:asc'
           }
         })
       )
-      .build(function (err) {
-        if (err) return done(err)
+      .build()
+      .then(function () {
         const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(limit, articles.length)
-        assert.strictEqual('Alpha', articles[0].title)
-        assert.strictEqual('Beta', articles[1].title)
-        done()
+        assert.deepStrictEqual(articles.map(a => a.title), ['Alpha','Beta'])
       })
   })
 
-  it('should accept a "limit" higher than the collection length', function (done) {
+  it('should accept a "limit" higher than the collection length', function () {
     const metalsmith = Metalsmith('test/fixtures/limit')
-    metalsmith
+    return metalsmith
       .use(
         collections({
           articles: {
-            sortBy: 'title',
+            sort: 'title:asc',
             limit: 25
           }
         })
       )
-      .build(function (err) {
-        if (err) return done(err)
+      .build()
+      .then(function () {
         const articles = metalsmith.metadata().collections.articles
-        assert.strictEqual(3, articles.length)
-        assert.strictEqual('Alpha', articles[0].title)
-        assert.strictEqual('Beta', articles[1].title)
-        assert.strictEqual('Gamma', articles[2].title)
-        done()
+        assert.deepStrictEqual(articles.map(a => a.title), ['Alpha','Beta','Gamma'])
       })
   })
 
@@ -228,38 +225,39 @@ describe('@metalsmith/collections', function () {
     })
   })
 
-  it('should logically map references with other options', function (done) {
+  it('should logically map references with other options', function () {
     const metalsmith = Metalsmith('test/fixtures/references-pointers')
 
-    new Promise((resolve) => {
-      metalsmith.use(collections({ articles: { sortBy: 'date', reverse: true } })).process(function (err) {
-        if (err) return done(err)
+    return metalsmith
+      .use(collections({ articles: { sort: 'date' } }))
+      .process()
+      .then(() => {
         const articles = metalsmith.metadata().collections.articles
         assert.deepStrictEqual(
           articles.map((a) => a.date),
           [new Date('2022-01-03'), new Date('2022-01-02'), new Date('2022-01-01')]
         )
         assert.deepStrictEqual(
-          articles.map((a) => a.previous && a.previous.date),
+          articles.map((a) => a.next && a.next.date),
           [new Date('2022-01-02'), new Date('2022-01-01'), null]
         )
-        resolve()
       })
-    }).then(() => {
-      metalsmith.use(collections({ articles: { sortBy: 'title', reverse: true, limit: 2 } })).process(function (err) {
-        if (err) return done(err)
-        const articles = metalsmith.metadata().collections.articles
-        assert.deepStrictEqual(
-          articles.map((a) => a.title),
-          [3, 2]
-        )
-        assert.deepStrictEqual(
-          articles.map((a) => a.previous && a.previous.title),
-          [2, null]
-        )
-        done()
+      .then(() => {
+        return metalsmith
+          .use(collections({ articles: { sort: 'title:desc', limit: 2 } }))
+          .process()
+          .then(() => {
+            const articles = metalsmith.metadata().collections.articles
+            assert.deepStrictEqual(
+              articles.map((a) => a.title),
+              [3, 2]
+            )
+            assert.deepStrictEqual(
+              articles.map((a) => a.previous && a.previous.title),
+              [null, 3]
+            )
+          })
       })
-    })
   })
 
   it('should not fail with empty collections', function (done) {
@@ -267,10 +265,7 @@ describe('@metalsmith/collections', function () {
     metalsmith
       .use(
         collections({
-          articles: {
-            sortBy: 'date',
-            reverse: true
-          }
+          articles: { sort: 'date' }
         })
       )
       .build(function (err) {
@@ -443,13 +438,13 @@ describe('@metalsmith/collections', function () {
       })
   })
 
-  it('should accept a "filterBy" function', function (done) {
+  it('should accept a "filter" function', function (done) {
     const metalsmith = Metalsmith('test/fixtures/filter')
     metalsmith
       .use(
         collections({
           articles: {
-            filterBy: function (articleMeta) {
+            filter(articleMeta) {
               if (articleMeta.date) {
                 const articleDate = new Date(articleMeta.date)
                 return articleDate.getFullYear() > 2011
