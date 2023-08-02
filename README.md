@@ -44,29 +44,30 @@ import { dirname } from 'path'
 const __dirname = dirname(new URL(import.meta.url).pathname)
 
 // defaults, only create collections based on file metadata
-Metalsmith(__dirname)
-  .use(markdown())
-  .use(collections())
+Metalsmith(__dirname).use(markdown()).use(collections())
 
 // defaults for a "news" collection, except pattern option
 Metalsmith(__dirname)
   .use(markdown())
-  .use(collections({
-    news: { pattern: 'news/**/*.html' }
-  }))
+  .use(
+    collections({
+      news: { pattern: 'news/**/*.html' }
+    })
+  )
 
 // explicit defaults for a "news" collection, except pattern option
 Metalsmith(__dirname)
   .use(markdown())
-  .use(collections({
-    pattern: { pattern: 'news/**/*.html' },
-    metadata: null,
-    filterBy: () => true,
-    sortBy: defaultSort,
-    reverse: false,
-    limit: Infinity,
-    refer: true
-  })
+  .use(
+    collections({
+      pattern: { pattern: 'news/**/*.html' },
+      metadata: null,
+      filter: () => true,
+      sort: 'date:desc',
+      limit: Infinity,
+      refer: true
+    })
+  )
 ```
 
 _Note: all examples in the readme use the same collections definitions under [Defining collections](#defining-collections)_
@@ -76,10 +77,9 @@ _Note: all examples in the readme use the same collections definitions under [De
 All options are _optional_
 
 - **pattern** `string|string[]` - one or more glob patterns to group files into a collection
-- **filterBy** `Function` - a function that returns `false` for files that should be filtered _out_ of the collection
+- **filter** `Function` - a function that returns `false` for files that should be filtered _out_ of the collection
 - **limit** `number` - restrict the number of files in a collection to at most `limit`
-- **sortBy** `string|Function` - a file metadata key to sort by (for example `date` or `pubdate` or `title`), or a custom sort function
-- **reverse** `boolean` - whether the sort should be reversed (e.g., for a news/blog collection, you typically want `reverse: true`)
+- **sort** `string|Function` - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, for example: `date` or `pubdate:desc` or `order:asc`, or a custom sort function
 - **metadata** `Object|string` - metadata to attach to the collection. Will be available as `metalsmith.metadata().collections.<name>.metadata`. This can be used for example to attach metadata for index pages. _If a string is passed, it will be interpreted as a file path to an external `JSON` or `YAML` metadata file_
 - **refer** `boolean` - will add `previous` and `next` keys to each file in a collection. `true` by default
 
@@ -100,8 +100,7 @@ There are 2 ways to create collections & they can be used together:
           slug: 'news'
         },
         pattern: 'news/**/*.html',
-        sortBy: 'pubdate',
-        reverse: true
+        sort: 'pubdate'
       },
       services: 'services/**/*.html'
     })
@@ -144,7 +143,7 @@ There are 2 ways to create collections & they can be used together:
 
 ### Rendering collection items
 
-Here is an example of using [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-handlebars](https://github.com/jstransformers/jstransformer-handlebars) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
+Here is an example of using [@metalsmith/permalinks](https://github.com/metalsmith/permalinks), followed by [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-handlebars](https://github.com/jstransformers/jstransformer-handlebars) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
 
 `layouts/news.njk`
 
@@ -156,13 +155,16 @@ Here is an example of using [@metalsmith/layouts](https://github.com/metalsmith/
 {{!-- previous & next are added by @metalsmith/collections --}}
 {{#if previous}}
 Read the previous news:
-<a href="/{{ previous.path }}">{{ previous.title }}</a>
+<a href="/{{ next.permalink }}">{{ next.title }}</a>
 {{/if}}
 {{#if next}}
 Read the next news:
-<a href="/{{ next.path }}">{{ next.title }}</a>
+<a href="/{{ previous.permalink }}">{{ previous.title }}</a>
 {{/if}}
 ```
+
+The example above supposes an ordering of `pubdate:desc` (newest to oldest) or similar, which is why the "next news" corresponds to the `previous` property.
+If one would map the news dates they would be like: `['2023-01-20', 2023-01-10', '2023-01-01']`.
 
 _Note: If you don't need the `next` and `previous` references, you can pass the option `refer: false`_
 
@@ -194,13 +196,13 @@ No news at the moment...
 
 ### Custom sorting, filtering and limiting
 
-You could define an `order` property on a set of files and pass `sortBy: "order"` to `@metalsmith/collections` for example, or you could override the sort with a custom function (for example to do multi-level sorting). For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
+You could define an `order` property on a set of files and pass `sort: 'order:asc'` to `@metalsmith/collections` for example, or you could override the sort with a custom function (for example to do multi-level sorting). For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
 
 ```js
 metalsmith.use(
   collections({
     subpages: {
-      sortBy: function (a, b) {
+      sort(a, b) {
         let aNum, bNum
 
         aNum = +a.index
@@ -221,9 +223,9 @@ metalsmith.use(
 )
 ```
 
-_Note: the `sortBy` option also understands nested keypaths, e.g. `display.order`_
+_Note: the `sort` option also understands nested keypaths, e.g. `display.order:asc`_
 
-The `filterBy` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added. The filterBy function below could work for a collection named `thisYearsNews` as it would filter out all the items that are older than this year:
+The `filter` function is passed a single argument which corresponds to each file's metadata. You can use the metadata to perform comparisons or carry out other decision-making logic. If the function you supply evaluates to `true`, the file will be added to the collection. If it evaluates to `false`, the file will not be added. The filter function below could work for a collection named `thisYearsNews` as it would filter out all the items that are older than this year:
 
 ```js
 function filterBy(file) {
@@ -240,18 +242,18 @@ metalsmith.use(
   collections({
     recentArticles: {
       pattern: 'articles/**/*.html',
-      sortBy: 'date',
+      sort: 'date',
       limit: 10
     },
     archives: {
       pattern: 'archives/**/*.html',
-      sortBy: 'date'
+      sort: 'date'
     }
   })
 )
 ```
 
-_Note: the collection is first sorted, reversed, filtered, and then limited, if applicable._
+_Note: the collection is first sorted, filtered, and then limited, if applicable._
 
 ### Collection Metadata
 
@@ -277,8 +279,7 @@ Collection metadata can be loaded from a `json` or `yaml` file (path relative to
 metalsmith.use(
   collections({
     articles: {
-      sortBy: 'date',
-      reverse: true,
+      sort: 'date:asc',
       metadata: 'path/to/file.json'
     }
   })
@@ -311,8 +312,7 @@ Add the `@metalsmith/collections` key to your `metalsmith.json` `plugins` key:
     {
       "@metalsmith/collections": {
         "articles": {
-          "sortBy": "date",
-          "reverse": true
+          "sort": "date:asc"
         }
       }
     }
