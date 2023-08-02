@@ -8,6 +8,7 @@ export type CollectionConfig = {
     pattern?: string | string[] | null;
     /**
      * - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, or a custom sort function
+     * @default 'path:asc'
      * @example
      * 'date'
      * 'pubdate:desc'
@@ -20,10 +21,12 @@ export type CollectionConfig = {
     limit?: number;
     /**
      * - Adds `next`, `previous`, `first` and `last` keys to file metadata of matched files
+     * @default true
      */
     refer?: boolean;
     /**
      * - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
+     * @default () => true
      */
     filter?: Function;
     /**
