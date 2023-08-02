@@ -79,7 +79,7 @@ All options are _optional_
 - **pattern** `string|string[]` - one or more glob patterns to group files into a collection
 - **filter** `Function` - a function that returns `false` for files that should be filtered _out_ of the collection
 - **limit** `number` - restrict the number of files in a collection to at most `limit`
-- **sort** `string|Function` - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, for example: `date` or `pubdate:desc` or `order:asc`, or a custom sort function
+- **sort** `string|Function` - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, for example: `date` or `pubdate:desc` or `order:asc`, or a custom sort function. Defaults to `path:asc` which is filesystem alphabetical order.
 - **metadata** `Object|string` - metadata to attach to the collection. Will be available as `metalsmith.metadata().collections.<name>.metadata`. This can be used for example to attach metadata for index pages. _If a string is passed, it will be interpreted as a file path to an external `JSON` or `YAML` metadata file_
 - **refer** `boolean` - will add `next`, `previous`, `first` and `last` keys to each file in a collection. `true` by default
 
@@ -141,6 +141,21 @@ There are 2 ways to create collections & they can be used together:
   ...contents
   ```
 
+#### Sorting
+
+By default sorting is done on `path:asc`, which is alphabetical filepath order.
+When `@metalsmith/collections` runs, it temporarily adds a `path` to the sorting context.
+
+When the sorting order (_asc_ ending or _desc_ ending) is omitted, _desc_ ending is implied.
+
+So `prop:asc` for the following file metadata would be ordered as:
+
+- `pubdate:asc`: `[Date(2023-01-01), Date(2023-01-05), Date(2023-01-03)]` -> `[Date(2023-01-01), Date(2023-01-03), Date(2023-01-05)]`
+- `path:asc`: `['news/one.md', 'news/two.md', 'news/three.md']` -> `['news/one.md', 'news/three.md', 'news/two.md']`
+- `order:asc`: `[5,2,6]` -> `[2,5,6]`
+
+These examples show how date-ordered collections like posts, news, feeds are sorted in _descending_ order (most recent first) and a timeline would be in _ascending_ order.
+
 ### Rendering collection items
 
 Here is an example of using [@metalsmith/permalinks](https://github.com/metalsmith/permalinks), followed by [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-handlebars](https://github.com/jstransformers/jstransformer-handlebars) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
@@ -196,7 +211,7 @@ No news at the moment...
 
 ### Custom sorting, filtering and limiting
 
-You could define an `order` property on a set of files and pass `sort: 'order:asc'` to `@metalsmith/collections` for example, or you could override the sort with a custom function (for example to do multi-level sorting). For instance, this function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
+You could define an `order` property on a set of files and pass `sort: 'order:asc'` to `@metalsmith/collections` for example, or you could override the sort with a custom function (for example to do multi-level sorting). The function below function sorts the "subpages" collection by a numerical "index" property but places unindexed items last.
 
 ```js
 metalsmith.use(
