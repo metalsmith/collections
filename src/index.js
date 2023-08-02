@@ -22,8 +22,7 @@ function sortBy(key, order) {
   }
 }
 
-// for backwards-compatibility only, date makes as little sense as "pubdate" or any custom key
-const defaultSort = sortBy('date', 'desc')
+const defaultSort = sortBy('path', 'asc')
 const defaultFilter = () => true
 
 /**
@@ -184,9 +183,25 @@ function collections(options) {
         debug('Warning: overwriting previously set metadata property %s', name)
       }
       // apply sort, filter, limit options in this order
-      let currentCollection = (metadata.collections[name] = matches.sort(sort))
 
+      let currentCollection = (metadata.collections[name] = matches)
+
+      // safely add to and remove from the sorting context 'path' property
+      const originalPaths = []
+      currentCollection.forEach((item) => {
+        if (item.path) originalPaths.push([item, item.path])
+        item.path = metalsmith.path(Object.entries(files).find((entry) => entry[1] === item)[0])
+      })
+      currentCollection = currentCollection.sort(sort)
       currentCollection = metadata.collections[name] = currentCollection.filter(filter).slice(0, limit)
+      currentCollection.forEach((item) => {
+        const original = originalPaths.find(([file]) => file === item)
+        if (original) {
+          item.path = original[1]
+        } else {
+          delete item.path
+        }
+      })
 
       if (collection.metadata) {
         currentCollection.metadata = collection.metadata

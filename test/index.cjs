@@ -102,6 +102,20 @@ describe('@metalsmith/collections', function () {
       })
   })
 
+  it('should "sort" on path by default', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/basic')
+    metalsmith.use(collections({ articles: { pattern: '*.md' }})).build(function (err) {
+        try {
+          assert(!(err instanceof Error))
+          const articles = metalsmith.metadata().collections.articles
+          assert.deepStrictEqual(articles.map(a => a.contents.toString().trim()), ['one','three','two'])
+          done()
+        } catch (err) {
+          done(err)
+        }
+    })
+  })
+
   it('should accept a "sort" option', function (done) {
     const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith.use(collections({ articles: { sort: 'title' } })).build(function (err) {
