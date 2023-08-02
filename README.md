@@ -15,7 +15,7 @@ A Metalsmith plugin that lets you group files together into ordered collections,
 - can limit the number of files in a collection
 - can filter files in a collection based on file metadata
 - adds collections to global metadata
-- adds `next` and `previous` references to each file in the collection
+- adds `next`, `previous`, `first` and `last` references to each file in the collection
 
 ## Installation
 
@@ -81,7 +81,7 @@ All options are _optional_
 - **limit** `number` - restrict the number of files in a collection to at most `limit`
 - **sort** `string|Function` - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, for example: `date` or `pubdate:desc` or `order:asc`, or a custom sort function
 - **metadata** `Object|string` - metadata to attach to the collection. Will be available as `metalsmith.metadata().collections.<name>.metadata`. This can be used for example to attach metadata for index pages. _If a string is passed, it will be interpreted as a file path to an external `JSON` or `YAML` metadata file_
-- **refer** `boolean` - will add `previous` and `next` keys to each file in a collection. `true` by default
+- **refer** `boolean` - will add `next`, `previous`, `first` and `last` keys to each file in a collection. `true` by default
 
 ### Defining collections
 
@@ -166,7 +166,7 @@ Read the next news:
 The example above supposes an ordering of `pubdate:desc` (newest to oldest) or similar, which is why the "next news" corresponds to the `previous` property.
 If one would map the news dates they would be like: `['2023-01-20', 2023-01-10', '2023-01-01']`.
 
-_Note: If you don't need the `next` and `previous` references, you can pass the option `refer: false`_
+_Note: If you don't need the `next`, `previous`, `first` or `last` references, you can pass the option `refer: false`_
 
 ### Rendering collection index
 
