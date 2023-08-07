@@ -292,21 +292,32 @@ describe('@metalsmith/collections', function () {
       })
   })
 
-  it('should add metadata objects to collections', function (done) {
+  it('should add metadata objects to collections', function () {
     const metalsmith = Metalsmith('test/fixtures/basic')
-    metalsmith
+    return metalsmith
       .use(
         collections({
           articles: {
-            metadata: { name: 'Batman' }
+            metadata: { name: 'Batman', test: 'Batman' }
           }
         })
       )
-      .build(function (err) {
-        if (err) return done(err)
+      .build()
+      .then(() => {
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.collections.articles.metadata.name)
-        done()
+        assert.strictEqual(m.collections.articles.test, 'Batman')
+      })
+  })
+
+  it('should provide access to collection config via collection metadata', function () {
+    const metalsmith = Metalsmith('test/fixtures/basic')
+    return metalsmith
+      .use(collections({ articles: { refer: false }}))
+      .build()
+      .then(() => {
+        const m = metalsmith.metadata()
+        assert.strictEqual(m.collections.articles.config.limit, Infinity)
+        assert.strictEqual(m.collections.articles.config.refer, false)
       })
   })
 
@@ -323,7 +334,7 @@ describe('@metalsmith/collections', function () {
       .build(function (err) {
         if (err) return done(err)
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.collections.articles.metadata.name)
+        assert.strictEqual('Batman', m.collections.articles.name)
         done()
       })
   })
@@ -341,7 +352,25 @@ describe('@metalsmith/collections', function () {
       .build(function (err) {
         if (err) return done(err)
         const m = metalsmith.metadata()
-        assert.strictEqual('Batman', m.collections.articles.metadata.name)
+        assert.strictEqual('Batman', m.collections.articles.name)
+        done()
+      })
+  })
+
+  it('should load collection metadata from a YAML file', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/metadata')
+    metalsmith
+      .use(
+        collections({
+          articles: {
+            metadata: 'metadata.yaml'
+          }
+        })
+      )
+      .build(function (err) {
+        if (err) return done(err)
+        const m = metalsmith.metadata()
+        assert.strictEqual('Batman', m.collections.articles.name)
         done()
       })
   })
