@@ -22,6 +22,19 @@ function sortBy(key, order) {
   }
 }
 
+/**
+ * @param {import('metalsmith').File[]} items
+ * @param {CollectionConfig} config
+ */
+function Collection(items, { metadata, ...config }) {
+  const collection = [...items]
+  Object.assign(collection, metadata)
+  collection.config = config
+  collection.constructor = Collection
+  Object.seal(collection)
+  return collection
+}
+
 const defaultSort = sortBy('path', 'asc')
 const defaultFilter = () => true
 
@@ -140,11 +153,11 @@ function collections(options) {
 
     debug('Identified %s collections: %s', mappedCollections.length, collectionNames.join())
 
-    mappedCollections.forEach((collection) => {
-      const { pattern, filter, sort, refer, limit } = collection
-      const name = collection.name
+    mappedCollections.forEach((collectionConfig) => {
+      const { pattern, filter, sort, refer, limit } = collectionConfig
+      const name = collectionConfig.name
       const matches = []
-      debug('Processing collection %s with options %s:', name, collection)
+      debug('Processing collection %s with options %s:', name, collectionConfig)
 
       // first match by pattern if provided
       if (pattern) {
@@ -159,8 +172,8 @@ function collections(options) {
             } else if (typeof data.collection === 'string') {
               data.collection = [data.collection]
             }
-            if (!data.collection.includes(collection.name)) {
-              data.collection = [...data.collection, collection.name]
+            if (!data.collection.includes(collectionConfig.name)) {
+              data.collection = [...data.collection, collectionConfig.name]
             }
             return data
           })
@@ -173,27 +186,24 @@ function collections(options) {
         Object.values(files).filter((file) => {
           const patternMatched = matches.includes(file)
           const isInCollection = Array.isArray(file.collection)
-            ? file.collection.includes(collection.name)
-            : file.collection === collection.name
+            ? file.collection.includes(collectionConfig.name)
+            : file.collection === collectionConfig.name
           return !patternMatched && isInCollection
         })
       )
 
-      if (Object.prototype.hasOwnProperty.call(metadata, name)) {
-        debug('Warning: overwriting previously set metadata property %s', name)
-      }
       // apply sort, filter, limit options in this order
 
-      let currentCollection = (metadata.collections[name] = matches)
-
+      let currentCollection = matches
       // safely add to and remove from the sorting context 'path' property
       const originalPaths = []
       currentCollection.forEach((item) => {
         if (item.path) originalPaths.push([item, item.path])
         item.path = metalsmith.path(Object.entries(files).find((entry) => entry[1] === item)[0])
       })
-      currentCollection = currentCollection.sort(sort)
-      currentCollection = metadata.collections[name] = currentCollection.filter(filter).slice(0, limit)
+
+      currentCollection = currentCollection.sort(sort).filter(filter).slice(0, limit)
+
       currentCollection.forEach((item) => {
         const original = originalPaths.find(([file]) => file === item)
         if (original) {
@@ -203,9 +213,8 @@ function collections(options) {
         }
       })
 
-      if (collection.metadata) {
-        currentCollection.metadata = collection.metadata
-      }
+      metadata.collections[name] = Collection(currentCollection, collectionConfig)
+
       if (refer) {
         const lastIndex = currentCollection.length - 1
         currentCollection.forEach((file, i) => {
