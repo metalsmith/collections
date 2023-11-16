@@ -24,13 +24,13 @@ const defaultFilter = () => true
 
 /**
  * @typedef {Object} CollectionConfig
- * @property {string|string[]} pattern - One or more glob patterns to match files to a collection
- * @property {string|(a,b) => 0|1|-1} sortBy - A key to sort by (e.g. `date`,`title`, ..) or a custom sort function
- * @property {number} limit - Limit the amount of items in a collection to `limit`
- * @property {boolean} refer - Adds `next` and `previous` keys to file metadata of matched files
- * @property {boolean} reverse - Whether to invert the sorting function results (asc/descending)
- * @property {Function} filterBy - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
- * @property {Object|string} metadata - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
+ * @property {string|string[]} [pattern] - One or more glob patterns to match files to a collection
+ * @property {string|(a,b) => 0|1|-1} [sortBy] - A key to sort by (e.g. `date`,`title`, ..) or a custom sort function
+ * @property {number} [limit] - Limit the amount of items in a collection to `limit`
+ * @property {boolean} [refer] - Adds `next` and `previous` keys to file metadata of matched files
+ * @property {boolean} [reverse] - Whether to invert the sorting function results (asc/descending)
+ * @property {Function} [filterBy] - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
+ * @property {Object|string} [metadata] - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
  */
 
 /** @type {CollectionConfig} */
