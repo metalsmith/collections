@@ -5,31 +5,31 @@ export type CollectionConfig = {
     /**
      * - One or more glob patterns to match files to a collection
      */
-    pattern?: string | string[] | null;
+    pattern: string | string[];
     /**
      * - A key to sort by (e.g. `date`,`title`, ..) or a custom sort function
      */
-    sortBy?: string | ((a: any, b: any) => 0 | 1 | -1);
+    sortBy: string | ((a: any, b: any) => 0 | 1 | -1);
     /**
      * - Limit the amount of items in a collection to `limit`
      */
-    limit?: number;
+    limit: number;
     /**
      * - Adds `next` and `previous` keys to file metadata of matched files
      */
-    refer?: boolean;
+    refer: boolean;
     /**
      * - Whether to invert the sorting function results (asc/descending)
      */
-    reverse?: boolean;
+    reverse: boolean;
     /**
      * - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
      */
-    filterBy?: Function;
+    filterBy: Function;
     /**
      * - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
      */
-    metadata?: any | string | null;
+    metadata: any | string;
 };
 /**
  * Add `collections` of files to the global metadata as a sorted array.
