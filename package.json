@@ -62,7 +62,7 @@
     "lint:check": "eslint --fix-dry-run .",
     "dev": "nodemon --exec 'npm test'",
     "release": "release-it .",
-    "build": "microbundle --target node --no-sourcemap -f cjs,esm --strict --generateTypes=false",
+    "build": "microbundle --target node -f cjs,esm --strict --generateTypes=false",
     "pretest": "npm run build",
     "test": "nyc mocha"
   },
