@@ -1,6 +1,6 @@
 import Metalsmith from "metalsmith";
 
-export default initializeCollections;
+export default collections;
 export type CollectionConfig = {
     /**
      * - One or more glob patterns to match files to a collection
@@ -45,10 +45,10 @@ export type CollectionConfig = {
  *
  * @param {Object.<string,CollectionConfig|string>} options
  */
-declare function initializeCollections(options: {
+declare function collections(options: {
     [x: string]: CollectionConfig | string;
 }): Metalsmith.Plugin;
-declare namespace initializeCollections {
+declare namespace collections {
     export { defaultOptions as defaults };
 }
 

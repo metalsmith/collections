@@ -84,7 +84,7 @@ function normalizeOptions(options) {
  * @param {Object.<string,CollectionConfig|string>} options
  * @return {import('metalsmith').Plugin}
  */
-function initializeCollections(options) {
+function collections(options) {
   options = normalizeOptions(options)
   const collectionNames = Object.keys(options)
   const mappedCollections = collectionNames.map((name) => {
@@ -198,6 +198,6 @@ function initializeCollections(options) {
   }
 }
 
-initializeCollections.defaults = defaultOptions
+collections.defaults = defaultOptions
 
-export default initializeCollections
+export default collections
