@@ -1,9 +1,6 @@
-/* eslint-env node, mocha */
 const assert = require('assert')
 const Metalsmith = require('metalsmith')
 const layouts = require('@metalsmith/layouts')
-
-/* eslint-disable-next-line node/no-missing-require */
 const collections = require('..')
 const { name } = require('../package.json')
 
@@ -567,8 +564,7 @@ describe('@metalsmith/collections', function () {
       try  {
         const expectedFiles = await Metalsmith('test/fixtures/render')
           .source('build')
-          .destination('expected')
-          [process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
+          .destination('expected')[process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
         assert.deepStrictEqual(
           Object.keys(files).sort().map(k => files[k].contents.toString()),
           Object.keys(expectedFiles).sort().map(k => files[k].contents.toString())
