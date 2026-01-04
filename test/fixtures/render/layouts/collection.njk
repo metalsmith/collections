@@ -1,0 +1,9 @@
+
+<h1>{{ title }}</h1>
+<a href="/">All collections</a>
+{% if collections.products.length %}
+<ul>
+{% for item in collections.products -%}
+  <li><a href="{{ item.permalink }}">{{ item.title }}</a></li>
+{% endfor %}</ul>
+{% endif %}

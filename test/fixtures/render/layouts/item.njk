@@ -1,0 +1,21 @@
+<h1>{{ title }}</h1>
+
+Part of: {% for name in collection -%}
+<a href="{{ collections[name].permalink }}">{{ collections[name].title }}</a>{% if not loop.last %}, {% endif%}
+{%- endfor %}
+{% for name in collection %}
+  {% if collection[name].previous.length %}
+  Direct prev: {{ collection[name].previous.title }}
+  Previous {{ name }}:
+  {% for prev in collection[name].previous %}
+  <a href="{{ prev.permalink }}"><-- {{ name }} / {{ prev.title }}</p>
+  {% endfor %}
+  {% endif %}
+  {% if collection[name].next.length %}
+  Direct next: {{ collection[name].next.title }}
+  Next {{ name }}:
+  {% for next in collection[name].next %}
+  <a href="{{ next.permalink }}"> {{ name }} / {{ next.title }} --></p>
+  {% endfor %}
+  {% endif %}
+{% endfor %}

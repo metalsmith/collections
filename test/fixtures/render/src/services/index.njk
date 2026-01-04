@@ -1,0 +1,11 @@
+---
+title: Services
+layout: collection.njk
+---
+<a href="/">All collections</a>
+{% if collections.services.length %}
+<ul>
+{% for item in collections.services -%}
+  <li><a href="{{ item.permalink }}">{{ item.title }}</a></li>
+{% endfor %}</ul>
+{% endif %}

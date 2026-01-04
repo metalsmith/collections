@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 const assert = require('assert')
 const Metalsmith = require('metalsmith')
+const layouts = require('@metalsmith/layouts')
 
 /* eslint-disable-next-line node/no-missing-require */
 const collections = require('..')
@@ -539,6 +540,43 @@ describe('@metalsmith/collections', function () {
         assert.deepStrictEqual(remap(first), remap(metalsmith.metadata().collections))
         done()
       })
+    })
+  })
+
+  it('provides convenient access to data required for rendering', function (done) {
+    const metalsmith = Metalsmith('test/fixtures/render')
+      .env('DEBUG', process.env.DEBUG)
+      .use(collections({
+        services: {
+          metadata: {
+            title: 'Services',
+            permalink: 'services/'
+          }
+        },
+        products: {
+          metadata: {
+            title: 'Products',
+            permalink: 'products/'
+          }
+        }
+      }))
+      .use(layouts({ transform: 'nunjucks' }))
+
+    metalsmith.build(async (err, files) => {
+      if (err) done(err)
+      try  {
+        const expectedFiles = await Metalsmith('test/fixtures/render')
+          .source('build')
+          .destination('expected')
+          [process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
+        assert.deepStrictEqual(
+          Object.keys(files).sort().map(k => files[k].contents.toString()),
+          Object.keys(expectedFiles).sort().map(k => files[k].contents.toString())
+        )
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 })
