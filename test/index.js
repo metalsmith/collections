@@ -1,8 +1,14 @@
-const assert = require('assert')
-const Metalsmith = require('metalsmith')
-const layouts = require('@metalsmith/layouts')
-const collections = require('..')
-const { name } = require('../package.json')
+import assert from 'node:assert'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { readFileSync } from 'node:fs'
+
+import Metalsmith from 'metalsmith'
+import layouts from '@metalsmith/layouts'
+import collections from '../src/index.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const { name } = JSON.parse(readFileSync(resolve(__dirname, '../package.json'), 'utf-8'))
 
 describe('@metalsmith/collections', function () {
   it('should export a named plugin function matching package.json name', function () {
@@ -106,29 +112,35 @@ describe('@metalsmith/collections', function () {
 
   it('should "sort" on path by default', function (done) {
     const metalsmith = Metalsmith('test/fixtures/basic')
-    metalsmith.use(collections({ articles: { pattern: '*.md' }})).build(function (err) {
-        try {
-          assert(!(err instanceof Error))
-          const articles = metalsmith.metadata().collections.articles
-          assert.deepStrictEqual(articles.map(a => a.contents.toString().trim()), ['one','three','two'])
-          done()
-        } catch (err) {
-          done(err)
-        }
+    metalsmith.use(collections({ articles: { pattern: '*.md' } })).build(function (err) {
+      try {
+        assert(!(err instanceof Error))
+        const articles = metalsmith.metadata().collections.articles
+        assert.deepStrictEqual(
+          articles.map((a) => a.contents.toString().trim()),
+          ['one', 'three', 'two']
+        )
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 
   it('should accept a "sort" option', function (done) {
     const metalsmith = Metalsmith('test/fixtures/sort')
     metalsmith.use(collections({ articles: { sort: 'title' } })).build(function (err) {
-        try {
-          assert(!(err instanceof Error))
-          const articles = metalsmith.metadata().collections.articles
-          assert.deepStrictEqual(articles.map(a => a.title), ['Gamma', 'Beta', 'Alpha'])
-          done()
-        } catch (err) {
-          done(err)
-        }
+      try {
+        assert(!(err instanceof Error))
+        const articles = metalsmith.metadata().collections.articles
+        assert.deepStrictEqual(
+          articles.map((a) => a.title),
+          ['Gamma', 'Beta', 'Alpha']
+        )
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 
@@ -165,7 +177,10 @@ describe('@metalsmith/collections', function () {
         try {
           assert(!(err instanceof Error))
           const articles = metalsmith.metadata().collections.articles
-          assert.deepStrictEqual(articles.map(a => a.title), ['Alpha', 'Beta', 'Gamma'])
+          assert.deepStrictEqual(
+            articles.map((a) => a.title),
+            ['Alpha', 'Beta', 'Gamma']
+          )
           done()
         } catch (err) {
           done(err)
@@ -189,7 +204,10 @@ describe('@metalsmith/collections', function () {
       .then(function () {
         const articles = metalsmith.metadata().collections.articles
         assert.strictEqual(limit, articles.length)
-        assert.deepStrictEqual(articles.map(a => a.title), ['Alpha','Beta'])
+        assert.deepStrictEqual(
+          articles.map((a) => a.title),
+          ['Alpha', 'Beta']
+        )
       })
   })
 
@@ -207,7 +225,10 @@ describe('@metalsmith/collections', function () {
       .build()
       .then(function () {
         const articles = metalsmith.metadata().collections.articles
-        assert.deepStrictEqual(articles.map(a => a.title), ['Alpha','Beta','Gamma'])
+        assert.deepStrictEqual(
+          articles.map((a) => a.title),
+          ['Alpha', 'Beta', 'Gamma']
+        )
       })
   })
 
@@ -221,9 +242,18 @@ describe('@metalsmith/collections', function () {
         assert.strictEqual(articles[0].collection.articles.next[0], articles[1])
         assert.strictEqual(articles[1].collection.articles.previous[0], articles[0])
         assert.strictEqual(articles[1].collection.articles.next[0], articles[2])
-        assert.strictEqual(articles[2].collection.articles.previous[articles[2].collection.articles.previous.length - 1], articles[1])
-        assert.strictEqual(articles.some(a => a.collection.articles.last !== articles[2]), false)
-        assert.strictEqual(articles.some(a => a.collection.articles.first !== articles[0]), false)
+        assert.strictEqual(
+          articles[2].collection.articles.previous[articles[2].collection.articles.previous.length - 1],
+          articles[1]
+        )
+        assert.strictEqual(
+          articles.some((a) => a.collection.articles.last !== articles[2]),
+          false
+        )
+        assert.strictEqual(
+          articles.some((a) => a.collection.articles.first !== articles[0]),
+          false
+        )
         assert(!articles[2].next)
         done()
       } catch (err) {
@@ -264,7 +294,7 @@ describe('@metalsmith/collections', function () {
           [new Date('2022-01-03'), new Date('2022-01-02'), new Date('2022-01-01')]
         )
         assert.deepStrictEqual(
-          articles.map((a) => a.collection.articles.next.length ? a.collection.articles.next[0].date : null),
+          articles.map((a) => (a.collection.articles.next.length ? a.collection.articles.next[0].date : null)),
           [new Date('2022-01-02'), new Date('2022-01-01'), null]
         )
       })
@@ -279,7 +309,9 @@ describe('@metalsmith/collections', function () {
               [3, 2]
             )
             assert.deepStrictEqual(
-              articles.map((a) => a.collection.articles.previous.length ? a.collection.articles.previous[0].title : null),
+              articles.map((a) =>
+                a.collection.articles.previous.length ? a.collection.articles.previous[0].title : null
+              ),
               [null, 3]
             )
           })
@@ -322,7 +354,7 @@ describe('@metalsmith/collections', function () {
   it('should provide access to collection config via collection metadata', function () {
     const metalsmith = Metalsmith('test/fixtures/basic')
     return metalsmith
-      .use(collections({ articles: { refer: false }}))
+      .use(collections({ articles: { refer: false } }))
       .build()
       .then(() => {
         const m = metalsmith.metadata()
@@ -486,7 +518,12 @@ describe('@metalsmith/collections', function () {
         // pattern-matched collections should be added after front-matter collections
         assert.deepStrictEqual(Array.from(files['merged.md'].collection), ['news', 'patternMatched', 'patternMatched2'])
         // mixed pattern & front-matter collections should respect mixed order
-        assert.deepStrictEqual(Array.from(files['orderTest.md'].collection), ['fourth', 'fifth', 'patternMatched2', 'eight'])
+        assert.deepStrictEqual(Array.from(files['orderTest.md'].collection), [
+          'fourth',
+          'fifth',
+          'patternMatched2',
+          'eight'
+        ])
         // should not add a collection matched twice as duplicate
         assert.deepStrictEqual(Array.from(files['duplicateMatch.md'].collection), ['duplicateMatch', 'news'])
         done()
@@ -543,31 +580,38 @@ describe('@metalsmith/collections', function () {
   it('provides convenient access to data required for rendering', function (done) {
     const metalsmith = Metalsmith('test/fixtures/render')
       .env('DEBUG', process.env.DEBUG)
-      .use(collections({
-        services: {
-          metadata: {
-            title: 'Services',
-            permalink: 'services/'
+      .use(
+        collections({
+          services: {
+            metadata: {
+              title: 'Services',
+              permalink: 'services/'
+            }
+          },
+          products: {
+            metadata: {
+              title: 'Products',
+              permalink: 'products/'
+            }
           }
-        },
-        products: {
-          metadata: {
-            title: 'Products',
-            permalink: 'products/'
-          }
-        }
-      }))
+        })
+      )
       .use(layouts({ transform: 'nunjucks' }))
 
     metalsmith.build(async (err, files) => {
       if (err) done(err)
-      try  {
+      try {
         const expectedFiles = await Metalsmith('test/fixtures/render')
           .source('build')
-          .destination('expected')[process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
+          .destination('expected')
+          [process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
         assert.deepStrictEqual(
-          Object.keys(files).sort().map(k => files[k].contents.toString()),
-          Object.keys(expectedFiles).sort().map(k => files[k].contents.toString())
+          Object.keys(files)
+            .sort()
+            .map((k) => files[k].contents.toString()),
+          Object.keys(expectedFiles)
+            .sort()
+            .map((k) => files[k].contents.toString())
         )
         done()
       } catch (err) {

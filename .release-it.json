@@ -1,7 +1,7 @@
 {
   "hooks": {
     "before:init": ["npm run lint", "npm test"],
-    "after:bump": "auto-changelog -p --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release|skip changelog)'",
+    "after:bump": "auto-changelog -p --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '^((dev|chore|ci|test):|Release|skip changelog)'",
     "after:npm:bump": "npm pack",
     "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
@@ -10,7 +10,7 @@
     "commitArgs": ["-S"],
     "tagAnnotation": "Release ${version}",
     "tagArgs": ["-s"],
-    "changelog": "auto-changelog -u --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release|skip changelog)' --stdout  -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
+    "changelog": "auto-changelog -u --starting-date 2021-12-01 --commit-limit false --ignore-commit-pattern '^((dev|chore|ci|test):|Release|skip changelog)' --stdout  -t https://raw.githubusercontent.com/release-it/release-it/master/templates/changelog-compact.hbs"
   },
   "npm": {
     "publish": false

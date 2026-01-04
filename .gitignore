@@ -2,7 +2,7 @@ npm-debug.log*
 .npm
 *.tgz
 .eslintcache
-.nyc_output
+coverage
 coverage.info
 test/fixtures/*/build
 node_modules
