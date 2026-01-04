@@ -79,11 +79,15 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err, files) {
         if (err) return done(err)
-        assert.strictEqual(1, metalsmith.metadata().collections.blogs.length, 'length blogs')
-        assert.strictEqual(1, metalsmith.metadata().collections.pages.length, 'length page')
-        assert.deepStrictEqual(files['three.md'].collection, ['blogs'], 'collection blogs')
-        assert.deepStrictEqual(files['four.md'].collection, ['pages'], 'collection page')
-        done()
+        try {
+          assert.strictEqual(1, metalsmith.metadata().collections.blogs.length, 'length blogs')
+          assert.strictEqual(1, metalsmith.metadata().collections.pages.length, 'length page')
+          assert.deepStrictEqual(Array.from(files['three.md'].collection), ['blogs'])
+          assert.deepStrictEqual(Array.from(files['four.md'].collection), ['pages'])
+          done()
+        } catch (err) {
+          done(err)
+        }
       })
   })
 
@@ -97,7 +101,7 @@ describe('@metalsmith/collections', function () {
       )
       .build(function (err, files) {
         if (err) return done(err)
-        assert.deepStrictEqual(files['three.md'].collection, ['articles'])
+        assert.deepStrictEqual(Array.from(files['three.md'].collection), ['articles'])
         done()
       })
   })
@@ -214,15 +218,19 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ articles: {} })).build(function (err) {
       if (err) return done(err)
       const articles = metalsmith.metadata().collections.articles
-      assert(!articles[0].previous)
-      assert.strictEqual(articles[0].next, articles[1])
-      assert.strictEqual(articles[1].previous, articles[0])
-      assert.strictEqual(articles[1].next, articles[2])
-      assert.strictEqual(articles[2].previous, articles[1])
-      assert.strictEqual(articles.some(a => a.last !== articles[2]), false)
-      assert.strictEqual(articles.some(a => a.first !== articles[0]), false)
-      assert(!articles[2].next)
-      done()
+      try {
+        assert(!articles[0].collection.articles.previous.length)
+        assert.strictEqual(articles[0].collection.articles.next[0], articles[1])
+        assert.strictEqual(articles[1].collection.articles.previous[0], articles[0])
+        assert.strictEqual(articles[1].collection.articles.next[0], articles[2])
+        assert.strictEqual(articles[2].collection.articles.previous[articles[2].collection.articles.previous.length - 1], articles[1])
+        assert.strictEqual(articles.some(a => a.collection.articles.last !== articles[2]), false)
+        assert.strictEqual(articles.some(a => a.collection.articles.first !== articles[0]), false)
+        assert(!articles[2].next)
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 
@@ -231,13 +239,17 @@ describe('@metalsmith/collections', function () {
     metalsmith.use(collections({ articles: { refer: false } })).build(function (err) {
       if (err) return done(err)
       const articles = metalsmith.metadata().collections.articles
-      assert(!articles[0].previous)
-      assert(!articles[0].next)
-      assert(!articles[1].previous)
-      assert(!articles[1].next)
-      assert(!articles[2].previous)
-      assert(!articles[2].next)
-      done()
+      try {
+        assert(!articles[0].collection[0].previous)
+        assert(!articles[0].collection[0].next)
+        assert(!articles[1].collection[0].previous)
+        assert(!articles[1].collection[0].next)
+        assert(!articles[2].collection[0].previous)
+        assert(!articles[2].collection[0].next)
+        done()
+      } catch (err) {
+        done(err)
+      }
     })
   })
 
@@ -254,7 +266,7 @@ describe('@metalsmith/collections', function () {
           [new Date('2022-01-03'), new Date('2022-01-02'), new Date('2022-01-01')]
         )
         assert.deepStrictEqual(
-          articles.map((a) => a.next && a.next.date),
+          articles.map((a) => a.collection.articles.next.length ? a.collection.articles.next[0].date : null),
           [new Date('2022-01-02'), new Date('2022-01-01'), null]
         )
       })
@@ -269,7 +281,7 @@ describe('@metalsmith/collections', function () {
               [3, 2]
             )
             assert.deepStrictEqual(
-              articles.map((a) => a.previous && a.previous.title),
+              articles.map((a) => a.collection.articles.previous.length ? a.collection.articles.previous[0].title : null),
               [null, 3]
             )
           })
@@ -470,15 +482,15 @@ describe('@metalsmith/collections', function () {
       .build(function (err, files) {
         if (err) return done(err)
         // front-matter dynamically defined collections should respect order in front-matter
-        assert.deepStrictEqual(files['dynamicallyDefined.md'].collection, ['dynamic2', 'dynamic1'])
+        assert.deepStrictEqual(Array.from(files['dynamicallyDefined.md'].collection), ['dynamic2', 'dynamic1'])
         // front-matter dynamically defined collections should respect order of collection definition
-        assert.deepStrictEqual(files['onlyByPattern.md'].collection, ['patternMatched', 'patternMatched2'])
+        assert.deepStrictEqual(Array.from(files['onlyByPattern.md'].collection), ['patternMatched', 'patternMatched2'])
         // pattern-matched collections should be added after front-matter collections
-        assert.deepStrictEqual(files['merged.md'].collection, ['news', 'patternMatched', 'patternMatched2'])
+        assert.deepStrictEqual(Array.from(files['merged.md'].collection), ['news', 'patternMatched', 'patternMatched2'])
         // mixed pattern & front-matter collections should respect mixed order
-        assert.deepStrictEqual(files['orderTest.md'].collection, ['fourth', 'fifth', 'patternMatched2', 'eight'])
+        assert.deepStrictEqual(Array.from(files['orderTest.md'].collection), ['fourth', 'fifth', 'patternMatched2', 'eight'])
         // should not add a collection matched twice as duplicate
-        assert.deepStrictEqual(files['duplicateMatch.md'].collection, ['duplicateMatch', 'news'])
+        assert.deepStrictEqual(Array.from(files['duplicateMatch.md'].collection), ['duplicateMatch', 'news'])
         done()
       })
   })

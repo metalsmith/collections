@@ -103,6 +103,14 @@ function normalizeOptions(options, files, metalsmith) {
 }
 
 /**
+ * @typedef {Object} References
+ * @property {import('metalsmith').File[]} previous
+ * @property {import('metalsmith').File[]} next
+ * @property {import('metalsmith').File} first
+ * @property {import('metalsmith').File} last
+ */
+
+/**
  * Add `collections` of files to the global metadata as a sorted array.
  * @example
  * metalsmith.use(collections({
@@ -157,7 +165,7 @@ function collections(options) {
       const { pattern, filter, sort, refer, limit } = collectionConfig
       const name = collectionConfig.name
       const matches = []
-      debug('Processing collection %s with options %s:', name, collectionConfig)
+      debug('Processing collection %s with options %O:', name, collectionConfig)
 
       // first match by pattern if provided
       if (pattern) {
@@ -183,13 +191,22 @@ function collections(options) {
       // next match by "collection" key, but only push if the files haven't been added through pattern matching first
       matches.push.apply(
         matches,
-        Object.values(files).filter((file) => {
-          const patternMatched = matches.includes(file)
-          const isInCollection = Array.isArray(file.collection)
-            ? file.collection.includes(collectionConfig.name)
-            : file.collection === collectionConfig.name
-          return !patternMatched && isInCollection
-        })
+        Object.values(files)
+          .filter((file) => {
+            const patternMatched = matches.includes(file)
+            const isInCollection = Array.isArray(file.collection)
+              ? file.collection.includes(collectionConfig.name)
+              : file.collection === collectionConfig.name
+            return !patternMatched && isInCollection
+          })
+          .map((file) => {
+            if (!file.collection) {
+              file.collection = []
+            } else if (typeof file.collection === 'string') {
+              file.collection = [file.collection]
+            }
+            return file
+          })
       )
 
       // apply sort, filter, limit options in this order
@@ -218,12 +235,18 @@ function collections(options) {
       if (refer) {
         const lastIndex = currentCollection.length - 1
         currentCollection.forEach((file, i) => {
-          Object.assign(file, {
-            previous: i > 0 ? currentCollection[i - 1] : null,
-            next: i < lastIndex ? currentCollection[i + 1] : null,
+          file.collection[name] = Object.assign(file.collection[name] || {}, {
+            previous: [],
+            next: [],
             first: currentCollection[0],
             last: currentCollection[lastIndex]
           })
+          // previous and next are arrays in which resp. the last & first item are merged
+          // so users can easily get a single prev/next vs a list. Without it, getting the single prev is tricky, eg in NJK: {% set coll = collection.some.previous | last %}{{ coll.title }}
+          if (i > 0)
+            file.collection[name].previous = Object.assign(currentCollection.slice(0, i), currentCollection[i - 1])
+          if (i < lastIndex)
+            file.collection[name].next = Object.assign(currentCollection.slice(i + 1), currentCollection[i + 1])
         })
       }
 
