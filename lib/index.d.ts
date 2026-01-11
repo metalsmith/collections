@@ -20,7 +20,7 @@ export type CollectionConfig = {
      */
     limit?: number;
     /**
-     * - Adds `next`, `previous`, `first` and `last` keys to file metadata of matched files
+     * - Adds `next`, `previous`, `first` and `last` keys to `file.collection[name]` metadata of matched files
      * @default true
      */
     refer?: boolean;
@@ -34,6 +34,15 @@ export type CollectionConfig = {
      */
     metadata?: any | string | null;
 };
+
+/** Collection ordering metadata at `files[path].collection[name]` */
+export type ReferencesArray = string[] & {
+  previous: Metalsmith.File[] & Metalsmith.File;
+  next: Metalsmith.File[] & Metalsmith.File;
+  first: Metalsmith.File;
+  last: Metalsmith.File;
+}
+
 /**
  * Add `collections` of files to the global metadata as a sorted array.
  * @example

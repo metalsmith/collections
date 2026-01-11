@@ -43,7 +43,7 @@ const defaultFilter = () => true
  * @property {string|string[]} [pattern] - One or more glob patterns to match files to a collection
  * @property {string|(a,b) => 0|1|-1} [sort] - a sort string of the format `'<key_or_keypath>:<asc|desc>'`, followed by the sort order, or a custom sort function
  * @property {number} [limit] - Limit the amount of items in a collection to `limit`
- * @property {boolean} [refer] - Adds `next` and `previous` keys to file metadata of matched files
+ * @property {boolean} [refer] - Adds `next`, `previous`, `first` and `last` keys to `file.collection[name]` metadata of matched files
  * @property {Function} [filter] - A function that gets a `Metalsmith.File` as first argument and returns `true` for every file to include in the collection
  * @property {Object|string} [metadata] - An object with metadata to attach to the collection, or a `json`/`yaml`filepath string to load data from (relative to `Metalsmith.directory`)
  */
@@ -103,7 +103,7 @@ function normalizeOptions(options, files, metalsmith) {
 }
 
 /**
- * @typedef {Object} References
+ * @typedef {import('../lib/index').ReferencesArray}
  * @property {import('metalsmith').File[]} previous
  * @property {import('metalsmith').File[]} next
  * @property {import('metalsmith').File} first

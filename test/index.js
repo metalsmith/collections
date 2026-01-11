@@ -601,10 +601,9 @@ describe('@metalsmith/collections', function () {
     metalsmith.build(async (err, files) => {
       if (err) done(err)
       try {
-        const expectedFiles = await Metalsmith('test/fixtures/render')
-          .source('build')
-          .destination('expected')
-          [process.env.UPDATE_SNAPSHOTS ? 'build' : 'process']()
+        const ms = Metalsmith('test/fixtures/render').source('build').destination('expected')
+
+        const expectedFiles = await (process.env.UPDATE_SNAPSHOTS ? ms.build() : ms.process())
         assert.deepStrictEqual(
           Object.keys(files)
             .sort()

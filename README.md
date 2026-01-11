@@ -10,12 +10,11 @@ A Metalsmith plugin that lets you group files together into ordered collections,
 
 ## Features
 
-- can match files by `collection` file metadata
-- can match files by pattern
+- can match files by `collection` file metadata or pattern
 - can limit the number of files in a collection
 - can filter files in a collection based on file metadata
-- adds collections to global metadata
-- adds `next`, `previous`, `first` and `last` references to each file in the collection
+- adds collections to global metadata under the `collections` key.
+- adds `next`, `previous`, `first` and `last` references to each file's collection references
 
 ## Installation
 
@@ -70,7 +69,9 @@ Metalsmith(__dirname)
   )
 ```
 
-_Note: all examples in the readme use the same collections definitions under [Defining collections](#defining-collections)_
+With the example above, the file `src/news/world/something.html`'s `collection` property will become `['news']` but with extra properties attached, so that `file.collection.news.previous.title` resolves, as well as `file.collection.news.previous[0].title`
+
+_Note: all subsequent examples in the readme use the same collections definitions under [Defining collections](#defining-collections)_
 
 ### Options
 
@@ -97,10 +98,10 @@ There are 2 ways to create collections & they can be used together:
         metadata: {
           title: 'Latest news',
           description: 'All the latest in politics & world news',
-          slug: 'news'
+          permalink: 'news'
         },
         pattern: 'news/**/*.html',
-        sort: 'pubdate'
+        sort: 'pubdate:desc'
       },
       services: 'services/**/*.html'
     })
@@ -144,9 +145,9 @@ There are 2 ways to create collections & they can be used together:
 #### Sorting
 
 By default sorting is done on `path:asc`, which is alphabetical filepath order.
-When `@metalsmith/collections` runs, it temporarily adds a `path` to the sorting context.
+When `@metalsmith/collections` runs, it temporarily adds the file `path` to the sorting context.
 
-When the sorting order (_asc_ ending or _desc_ ending) is omitted, _desc_ ending is implied.
+When the sorting order (_asc_-ending or _desc_-ending) is omitted, _desc_ ending is implied.
 
 So `prop:asc` for the following file metadata would be ordered as:
 
@@ -158,24 +159,50 @@ These examples show how date-ordered collections like posts, news, feeds are sor
 
 ### Rendering collection items
 
-Here is an example of using [@metalsmith/permalinks](https://github.com/metalsmith/permalinks), followed by [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-handlebars](https://github.com/jstransformers/jstransformer-handlebars) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
+> [!IMPORTANT]
+> Mind the difference between **collection** and **collections**: the _collections_ object is stored on `metalsmith.metadata()` and accessible to all files when using @metalsmith/layouts or in-place. Matched files each get an own _collection_ property, - an array of collection names -, with each collection also accessible by name (file.collection\[name]).
+
+Here is an example of using [@metalsmith/permalinks](https://github.com/metalsmith/permalinks), followed by [@metalsmith/layouts](https://github.com/metalsmith/layouts) with [jstransformer-nunjucks](https://github.com/jstransformers/jstransformer-nunjucks) to render the `something-happened.md` news item, with links to the next and previous news items (using `refer: true` options):
 
 `layouts/news.njk`
 
-```handlebars
-<h1>{{ title }}</h1> {{!-- something-happened.md title --}}
-<a href="/{{ collections.news.metadata.slug }}">Back to news</a> {{!-- news collection metadata.slug --}}
+```nunjucks
+<h1>{{ title }}</h1>
+
+{# permalink is expected to be set from collection metadata here #}
+<a href="{{ baseurl }}/{{ collections.news.permalink }}">See all {{ collections.news.title }}</a>
+{% endfor %}
 {{ contents | safe }}
 <hr>
-{{!-- previous & next are added by @metalsmith/collections --}}
-{{#if previous}}
+{{#if collection.news.previous.length }}
 Read the previous news:
-<a href="/{{ next.permalink }}">{{ next.title }}</a>
+<a href="/{{ collection.news.next.permalink }}">{{ collection.news.next.title }}</a>
 {{/if}}
-{{#if next}}
+{{#if collection.news.next.length }}
 Read the next news:
-<a href="/{{ previous.permalink }}">{{ previous.title }}</a>
+<a href="/{{ collection.news.previous.permalink }}">{{ collection.news.previous.title }}</a>
 {{/if}}
+```
+
+The previous example shows how to get the "first" previous/ next references, the next example show how you can iterate over each collection and render the full list of next/ previous items.
+
+```nunjucks
+<h1>{{ title }}</h1>
+
+Part of: {% for name in collection -%}
+<a href="{{ baseurl }}/{{ collections[name].permalink }}">{{ collections[name].title }}</a>{% if not loop.last %}, {% endif%}
+{%- endfor %}
+{% for name in collection %}
+  {% if collection[name].previous.length %}
+  {% for prev in collection[name].previous %}
+  <a href="{{ prev.permalink }}"><-- {{ name }} / {{ prev.title }}</p>
+  {% endfor %}
+  {% endif %}
+  {% for next in collection[name].next %}
+  <a href="{{ next.permalink }}"> {{ name }} / {{ next.title }} --></p>
+  {% endfor %}
+  {% endif %}
+{% endfor %}
 ```
 
 The example above supposes an ordering of `pubdate:desc` (newest to oldest) or similar, which is why the "next news" corresponds to the `previous` property.
@@ -185,7 +212,7 @@ _Note: If you don't need the `next`, `previous`, `first` or `last` references, y
 
 ### Rendering collection index
 
-All matched files are added to an array that is exposed as a key of metalsmith global metadata, for example the `news` collection would be accessible at `Metalsmith.metadata().collections.news `. Below is an example of how you could render an index page for the `news` collection:
+All matched files are added to an array that is exposed as a key of metalsmith global metadata, for example the `news` collection would be accessible at `Metalsmith.metadata().collections.news `. Below is a handlebarsexample of how you could render an index page for the `news` collection:
 
 `layouts/news-index.hbs`
 
@@ -193,12 +220,11 @@ All matched files are added to an array that is exposed as a key of metalsmith g
 <h1>{{ title }}</h1> {{!-- news collection metadata.title --}}
 <p>{{ description }}</p> {{!-- news collection metadata.description --}}
 <hr>
-{{!-- previous & next are added by @metalsmith/collections --}}
 {{#if collections.news.length }}
   <ul>
   {{#each collections.news}}
     <li>
-      <h3><a href="/{{path}}">{{ title }}</a></h3>
+      <h3><a href="{{ baseurl }}/{{ permalink }}">{{ title }}</a></h3>
       <p>{{ excerpt }}</p>
     </li>
   {{/each}}
@@ -288,7 +314,7 @@ metalsmith.use(
 )
 ```
 
-Collection metadata can be loaded from a `json` or `yaml` file (path relative to `Metalsmith.directory()`):
+Collection metadata can be loaded from a `json` or `yaml` file (path relative to `Metalsmith.source()`):
 
 ```js
 metalsmith.use(
